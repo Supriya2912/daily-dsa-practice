@@ -37,5 +37,3 @@ I consistently solve problems from platforms like **LeetCode, GeeksforGeeks, and
 - C++ ⚙️  
 
 ---
-
-## 📁 Repository Structure
