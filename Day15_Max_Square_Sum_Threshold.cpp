@@ -1,0 +1,55 @@
+## Maximum Side Length of a Square With Sum ≤ Threshold
+
+### Approach
+- Use 2D prefix sum for O(1) submatrix sum
+- Maintain a growing max square size
+- At each cell, try expanding by 1
+
+### Key Insight
+If a square of size k is valid, all smaller squares are valid.
+
+### Complexity
+- Time: O(m × n)
+- Space: O(m × n)
+
+
+###solution:
+class Solution {
+public:
+    int maxSideLength(vector<vector<int>>& mat, int threshold) {
+        int m = mat.size();
+        int n = mat[0].size();
+        
+        vector<vector<int>> pref(m + 1, vector<int>(n + 1, 0));
+        
+        for (int row = 1; row <= m; row++) {
+            for (int col = 1; col <= n; col++) {
+                // pref[row][col] = current_val + top + left - diagonal_overlap
+                pref[row][col] = mat[row-1][col-1] + pref[row-1][col] + pref[row][col-1] - pref[row-1][col-1];
+            }
+        }
+        
+        int maxLen = 0;
+        
+        for (int row = 1; row <= m; row++) {
+            for (int col = 1; col <= n; col++) {
+                
+                int currentLen = maxLen + 1;
+                
+                if (row >= currentLen && col >= currentLen) {
+                    
+                    int r1 = row - currentLen + 1;
+                    int c1 = col - currentLen + 1;
+                    
+                    int squareSum = pref[row][col] - pref[r1-1][col] - pref[row][c1-1] + pref[r1-1][c1-1];
+                    
+                    if (squareSum <= threshold) {
+                        maxLen++; 
+                    }
+                }
+            }
+        }
+        
+        return maxLen;
+    }
+};
