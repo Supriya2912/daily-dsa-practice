@@ -1,0 +1,223 @@
+# 🦘 Jump Game V
+
+## 🧩 Problem Statement
+
+You are given an integer array `arr` and an integer `d`.
+
+From index `i`, you can jump to another index `j` if:
+
+- `|i - j| <= d`
+- `arr[j] < arr[i]`
+
+You can jump:
+
+- **left** (`i - 1, i - 2, ...`)
+- **right** (`i + 1, i + 2, ...`)
+
+But jumping is **blocked** if you encounter an element:
+
+```text
+arr[k] >= arr[i]
+before reaching j.
+
+Your task is to return the maximum number of indices you can visit, starting from any index.
+
+📥 Input
+arr → integer array
+d → maximum jump distance
+📤 Output
+Maximum number of indices that can be visited
+🧪 Example
+Input
+arr = [6,4,14,6,8,13,9,7,10,6,12]
+d = 2
+Output
+4
+Explanation
+
+One optimal path:
+
+10 → 8 → 6 → 7
+
+Maximum reachable indices = 4
+
+💡 Approach (DFS + Memoization)
+
+This is a Dynamic Programming on Graphs problem.
+
+For each index i, compute:
+
+dp[i] = maximum jumps starting from index i
+
+Instead of recomputing multiple times, use memoization (DFS + DP).
+
+Step 1: DFS from each index
+
+Try jumping:
+
+right from i+1 to i+d
+left from i-1 to i-d
+Step 2: Stop when blocked
+
+If:
+
+arr[j] >= arr[i]
+
+you must stop searching further in that direction.
+
+Step 3: Memoize results
+
+Store:
+
+dp[i]
+
+so each index is computed only once.
+
+✅ C++ Solution
+class Solution {
+public:
+    int n;
+
+    int dfs(int i, vector<int>& arr, int d, vector<int>& dp) {
+
+        // Already computed
+        if (dp[i] != -1) {
+            return dp[i];
+        }
+
+        int ans = 1;
+
+        // Move right
+        for (int j = i + 1; j <= min(n - 1, i + d); j++) {
+            // Blocked
+            if (arr[j] >= arr[i]) {
+                break;
+            }
+
+            ans = max(ans, 1 + dfs(j, arr, d, dp));
+        }
+
+        // Move left
+        for (int j = i - 1; j >= max(0, i - d); j--) {
+            // Blocked
+            if (arr[j] >= arr[i]) {
+                break;
+            }
+
+            ans = max(ans, 1 + dfs(j, arr, d, dp));
+        }
+
+        return dp[i] = ans;
+    }
+
+    int maxJumps(vector<int>& arr, int d) {
+        n = arr.size();
+
+        vector<int> dp(n, -1);
+        int ans = 1;
+
+        for (int i = 0; i < n; i++) {
+            ans = max(ans, dfs(i, arr, d, dp));
+        }
+
+        return ans;
+    }
+};
+☕ Java Solution
+class Solution {
+    int n;
+
+    private int dfs(int i, int[] arr, int d, int[] dp) {
+        if (dp[i] != -1)
+            return dp[i];
+
+        int ans = 1;
+
+        // Move right
+        for (int j = i + 1; j <= Math.min(n - 1, i + d); j++) {
+            if (arr[j] >= arr[i])
+                break;
+
+            ans = Math.max(ans, 1 + dfs(j, arr, d, dp));
+        }
+
+        // Move left
+        for (int j = i - 1; j >= Math.max(0, i - d); j--) {
+            if (arr[j] >= arr[i])
+                break;
+
+            ans = Math.max(ans, 1 + dfs(j, arr, d, dp));
+        }
+
+        return dp[i] = ans;
+    }
+
+    public int maxJumps(int[] arr, int d) {
+        n = arr.length;
+        int[] dp = new int[n];
+        Arrays.fill(dp, -1);
+
+        int ans = 1;
+
+        for (int i = 0; i < n; i++) {
+            ans = Math.max(ans, dfs(i, arr, d, dp));
+        }
+
+        return ans;
+    }
+}
+🐍 Python Solution
+class Solution:
+    def maxJumps(self, arr, d):
+        n = len(arr)
+        dp = [-1] * n
+
+        def dfs(i):
+            if dp[i] != -1:
+                return dp[i]
+
+            ans = 1
+
+            # Move right
+            for j in range(i + 1, min(n, i + d + 1)):
+                if arr[j] >= arr[i]:
+                    break
+                ans = max(ans, 1 + dfs(j))
+
+            # Move left
+            for j in range(i - 1, max(-1, i - d - 1), -1):
+                if arr[j] >= arr[i]:
+                    break
+                ans = max(ans, 1 + dfs(j))
+
+            dp[i] = ans
+            return ans
+
+        result = 1
+        for i in range(n):
+            result = max(result, dfs(i))
+
+        return result
+⏱️ Complexity Analysis
+Time Complexity
+O(n × d)
+
+For each index, we explore up to d positions left and right.
+
+Space Complexity
+O(n)
+
+For memoization (dp) and recursion stack.
+
+🧠 Key Insight
+
+Use DFS + Memoization to avoid recalculating the maximum jump path from each index.
+
+The blocking rule (arr[j] >= arr[i]) is crucial—it prevents jumping beyond taller/equal elements.
+
+🚀 Tags
+
+Array Dynamic Programming DFS Memoization
+
+📌 Author
+supriya biradar
