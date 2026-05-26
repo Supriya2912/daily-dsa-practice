@@ -1,0 +1,144 @@
+# 🔤 Count the Number of Special Characters
+
+## 🧩 Problem Statement
+
+You are given a string `word` containing **uppercase and lowercase English letters**.
+
+A character is called **special** if **both**:
+
+- its lowercase form exists in the string
+- its uppercase form exists in the string
+
+Return the **number of special characters** in `word`.
+
+---
+
+## 📥 Input
+
+- `word` → a string containing English letters
+
+## 📤 Output
+
+- Number of **special characters**
+
+---
+
+## 🧪 Example
+
+### Input
+
+Output
+3
+Explanation
+
+Special characters are:
+
+'a' and 'A'
+'b' and 'B'
+'c' and 'C'
+
+So answer = 3
+
+💡 Approach (Hash Set)
+
+To efficiently check whether both lowercase and uppercase versions exist:
+
+Step 1
+
+Store all characters in a hash set.
+
+Step 2
+
+Loop through all lowercase letters:
+
+'a' → 'z'
+
+For each character ch:
+
+Check if ch exists
+Check if uppercase version exists:
+ch - 'a' + 'A'
+
+If both exist, increment count.
+
+✅ C++ Solution
+class Solution {
+public:
+    int numberOfSpecialChars(string word) {
+        
+        unordered_set<char> st(word.begin(), word.end());
+
+        int count = 0;
+
+        for(char ch = 'a'; ch <= 'z'; ch++) {
+
+            if(st.count(ch) && st.count(ch - 'a' + 'A')) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+};
+☕ Java Solution
+import java.util.*;
+
+class Solution {
+    public int numberOfSpecialChars(String word) {
+        Set<Character> set = new HashSet<>();
+
+        for(char ch : word.toCharArray()) {
+            set.add(ch);
+        }
+
+        int count = 0;
+
+        for(char ch = 'a'; ch <= 'z'; ch++) {
+            if(set.contains(ch) && set.contains((char)(ch - 'a' + 'A'))) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+}
+🐍 Python Solution
+class Solution:
+    def numberOfSpecialChars(self, word: str) -> int:
+        chars = set(word)
+        count = 0
+
+        for ch in range(ord('a'), ord('z') + 1):
+            lower = chr(ch)
+            upper = chr(ch - ord('a') + ord('A'))
+
+            if lower in chars and upper in chars:
+                count += 1
+
+        return count
+⏱️ Complexity Analysis
+Time Complexity
+O(n)
+Building the set takes O(n)
+Checking 26 letters is constant time
+Space Complexity
+O(n)
+
+For storing characters in the hash set.
+
+🧠 Key Insight
+
+Using a set allows constant-time lookup for both lowercase and uppercase letters.
+
+Instead of comparing every pair, we simply check:
+
+st.count(ch) && st.count(ch - 'a' + 'A')
+🚀 Tags
+
+String Hash Set
+
+📌 Author
+Supriya Biradar
+
+```text
+word = "aaAbcBC"
