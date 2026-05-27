@@ -1,0 +1,197 @@
+# 🔤 Count Special Characters II
+
+## 🧩 Problem Statement
+
+You are given a string `word` consisting of uppercase and lowercase English letters.
+
+A lowercase character is called **special** if:
+
+- its uppercase version also exists in the string
+- every lowercase occurrence appears **before** the first uppercase occurrence
+
+Return the number of special characters in `word`.
+
+---
+
+## 📥 Input
+
+- `word` → string containing uppercase and lowercase letters
+
+## 📤 Output
+
+- Number of special characters
+
+---
+
+## 🧪 Example
+
+### Input
+
+```text
+word = "aaAbcBC"
+Output
+3
+Explanation
+'a' appears before 'A'
+'b' appears before 'B'
+'c' appears before 'C'
+
+So the answer is:
+
+3
+💡 Approach (Track Positions)
+
+For each letter:
+
+Store:
+last occurrence of lowercase
+first occurrence of uppercase
+
+Use:
+
+temp[i].first  → last lowercase index
+temp[i].second → first uppercase index
+
+A character is special if:
+
+last lowercase index < first uppercase index
+
+and both exist.
+
+✅ C++ Solution
+class Solution {
+public:
+    int numberOfSpecialChars(string word) {
+
+        vector<pair<int,int>> temp(26, {-1, -1});
+
+        for (int i = 0; i < word.size(); i++) {
+
+            char ch = word[i];
+
+            // lowercase
+            if (ch >= 'a' && ch <= 'z') {
+                temp[ch - 'a'].first = i;
+            }
+
+            // uppercase
+            else {
+                if (temp[ch - 'A'].second == -1)
+                    temp[ch - 'A'].second = i;
+            }
+        }
+
+        int ans = 0;
+
+        for (int i = 0; i < 26; i++) {
+
+            int lowerIdx = temp[i].first;
+            int upperIdx = temp[i].second;
+
+            if (lowerIdx != -1 &&
+                upperIdx != -1 &&
+                lowerIdx < upperIdx) {
+
+                ans++;
+            }
+        }
+
+        return ans;
+    }
+};
+☕ Java Solution
+class Solution {
+    public int numberOfSpecialChars(String word) {
+
+        int[][] temp = new int[26][2];
+
+        for (int i = 0; i < 26; i++) {
+            temp[i][0] = -1;
+            temp[i][1] = -1;
+        }
+
+        for (int i = 0; i < word.length(); i++) {
+
+            char ch = word.charAt(i);
+
+            // lowercase
+            if (Character.isLowerCase(ch)) {
+                temp[ch - 'a'][0] = i;
+            }
+
+            // uppercase
+            else {
+                if (temp[ch - 'A'][1] == -1) {
+                    temp[ch - 'A'][1] = i;
+                }
+            }
+        }
+
+        int ans = 0;
+
+        for (int i = 0; i < 26; i++) {
+
+            int lower = temp[i][0];
+            int upper = temp[i][1];
+
+            if (lower != -1 && upper != -1 && lower < upper) {
+                ans++;
+            }
+        }
+
+        return ans;
+    }
+}
+🐍 Python Solution
+class Solution:
+    def numberOfSpecialChars(self, word: str) -> int:
+
+        temp = [[-1, -1] for _ in range(26)]
+
+        for i, ch in enumerate(word):
+
+            # lowercase
+            if ch.islower():
+                temp[ord(ch) - ord('a')][0] = i
+
+            # uppercase
+            else:
+                idx = ord(ch) - ord('A')
+
+                if temp[idx][1] == -1:
+                    temp[idx][1] = i
+
+        ans = 0
+
+        for lower, upper in temp:
+            if lower != -1 and upper != -1 and lower < upper:
+                ans += 1
+
+        return ans
+⏱️ Complexity Analysis
+Time Complexity
+O(n)
+
+We traverse the string once.
+
+Space Complexity
+O(1)
+
+Fixed array of size 26.
+
+🧠 Key Insight
+
+A character is valid only if:
+
+last lowercase occurrence
+        <
+first uppercase occurrence
+
+Tracking positions makes the solution efficient and clean.
+
+🚀 Tags
+
+String Array Hashing
+
+📌 Author
+supriya biradar
