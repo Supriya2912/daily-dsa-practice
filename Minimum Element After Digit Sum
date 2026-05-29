@@ -1,0 +1,149 @@
+# 🔢 Minimum Element After Digit Sum
+
+## 🧩 Problem Statement
+
+You are given an integer array `nums`.
+
+For each element in the array:
+
+1. Calculate the **sum of its digits**
+2. Replace the number with this digit sum
+
+Return the **minimum value** among all transformed elements.
+
+---
+
+## 📥 Input
+
+- `nums` → integer array
+
+## 📤 Output
+
+- Minimum digit-sum value in the array
+
+---
+
+## 🧪 Example
+
+### Input
+
+```text
+nums = [123, 45, 999, 10]
+
+Output
+1
+Explanation
+
+Digit sums:
+
+Number	Digit Sum
+123	1+2+3 = 6
+45	4+5 = 9
+999	9+9+9 = 27
+10	1+0 = 1
+
+Minimum value = 1
+
+💡 Approach
+
+For every number:
+
+Compute the sum of its digits
+Store the transformed value
+Return the minimum transformed number
+✅ C++ Solution
+class Solution {
+public:
+
+    // Function to calculate digit sum
+    int tempFunc(int n) {
+        int sum = 0;
+
+        while (n > 0) {
+            sum += n % 10;
+            n /= 10;
+        }
+
+        return sum;
+    }
+
+    int minElement(vector<int>& nums) {
+
+        // Replace each number with its digit sum
+        for (int i = 0; i < nums.size(); i++) {
+            nums[i] = tempFunc(nums[i]);
+        }
+
+        // Return minimum digit sum
+        return *min_element(nums.begin(), nums.end());
+    }
+};
+☕ Java Solution
+class Solution {
+
+    // Function to calculate digit sum
+    public int digitSum(int n) {
+        int sum = 0;
+
+        while (n > 0) {
+            sum += n % 10;
+            n /= 10;
+        }
+
+        return sum;
+    }
+
+    public int minElement(int[] nums) {
+
+        int ans = Integer.MAX_VALUE;
+
+        for (int num : nums) {
+            ans = Math.min(ans, digitSum(num));
+        }
+
+        return ans;
+    }
+}
+🐍 Python Solution
+class Solution:
+
+    # Function to calculate digit sum
+    def digit_sum(self, n):
+        total = 0
+
+        while n > 0:
+            total += n % 10
+            n //= 10
+
+        return total
+
+    def minElement(self, nums):
+
+        return min(self.digit_sum(x) for x in nums)
+⏱️ Complexity Analysis
+Time Complexity
+O(n × d)
+
+Where:
+
+n = number of elements
+d = number of digits per number
+Space Complexity
+O(1)
+
+Ignoring input modification.
+
+🧠 Key Insight
+
+Instead of comparing original numbers, we compare:
+
+sum of digits
+
+The smallest transformed value is the answer.
+
+🚀 Tags
+
+Array Math Digit Sum
+
+📌 Author
+Supriya Biradar
