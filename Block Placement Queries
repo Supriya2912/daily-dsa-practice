@@ -1,0 +1,436 @@
+# 🚧 Block Placement Queries
+
+## 🧩 Problem Statement
+
+You are given a series of queries on an infinite number line.
+
+There are two types of queries:
+
+### Type 1: Add Obstacle
+
+```text
+[1, x]
+Place an obstacle at position x.
+
+Type 2: Check Placement
+[2, x, sz]
+
+Determine whether a block of length sz can be placed entirely within the range:
+
+[0, x]
+
+without overlapping any obstacle.
+
+Return a boolean array containing the result for every Type-2 query.
+
+📥 Input
+queries[i] = [1, x] → insert obstacle at position x
+queries[i] = [2, x, sz] → check if a block of size sz fits in [0, x]
+📤 Output
+Boolean array of answers for all Type-2 queries.
+🧪 Example
+Input
+queries = [
+ [1,2],
+ [1,5],
+ [2,6,2],
+ [2,6,4]
+]
+Output
+[true,false]
+Explanation
+
+Obstacles:
+
+0 --- 2 --- 5 --- 6
+
+Available segments:
+
+[0,2] length = 2
+[2,5] length = 3
+[5,6] length = 1
+Block size 2 → possible ✅
+Block size 4 → impossible ❌
+💡 Approach
+
+We need to efficiently support:
+
+Inserting obstacles.
+Finding the largest free segment before a position x.
+
+Using only a set would make repeated range checks expensive.
+
+Data Structures Used
+Ordered Set
+
+Stores obstacle positions in sorted order.
+
+set<int> obstacles;
+
+Allows:
+
+Previous obstacle lookup
+Next obstacle lookup
+
+in:
+
+O(log n)
+Segment Tree
+
+Stores gap lengths between consecutive obstacles.
+
+Example:
+
+Obstacle positions:
+0 --- 2 --- 5 --- 10
+
+Stored gaps:
+2, 3, 5
+
+The segment tree supports:
+
+Update a gap after insertion
+Query maximum gap in a prefix
+
+Both in:
+
+O(log n)
+🔍 Key Observation
+
+For a query:
+
+[2, x, sz]
+
+Two possible free segments matter:
+
+Segment ending at x
+x - previousObstacle
+Any complete segment before previousObstacle
+
+Obtained using:
+
+st.query(previousObstacle)
+
+The maximum of these two values is the largest block that can fit.
+
+If:
+
+maxGap >= sz
+
+answer is:
+
+true
+
+otherwise:
+
+false
+✅ C++ Solution
+class SegTree {
+    int n;
+    vector<int> tree;
+
+public:
+    SegTree(int size) {
+        n = 1;
+        while (n <= size) n *= 2;
+        tree.assign(2 * n, 0);
+    }
+
+    void update(int i, int val) {
+        for (tree[i += n] = val; i > 1; i >>= 1)
+            tree[i >> 1] = max(tree[i], tree[i ^ 1]);
+    }
+
+    int query(int r) {
+        int res = 0;
+
+        for (int l = n, r_idx = r + n + 1;
+             l < r_idx;
+             l >>= 1, r_idx >>= 1) {
+
+            if (l & 1)
+                res = max(res, tree[l++]);
+
+            if (r_idx & 1)
+                res = max(res, tree[--r_idx]);
+        }
+
+        return res;
+    }
+};
+
+class Solution {
+public:
+    vector<bool> getResults(vector<vector<int>>& queries) {
+
+        int max_x = 0;
+
+        for (auto &q : queries)
+            max_x = max(max_x, q[1]);
+
+        SegTree st(max_x + 1);
+
+        set<int> obstacles = {0};
+
+        vector<bool> res;
+
+        for (auto &q : queries) {
+
+            // Type 1: Add obstacle
+            if (q[0] == 1) {
+
+                int x = q[1];
+
+                auto it = obstacles.lower_bound(x);
+
+                int nxt = (it != obstacles.end()) ? *it : -1;
+                int prev = *(--it);
+
+                st.update(x, x - prev);
+
+                if (nxt != -1)
+                    st.update(nxt, nxt - x);
+
+                obstacles.insert(x);
+            }
+
+            // Type 2: Check placement
+            else {
+
+                int x = q[1];
+                int sz = q[2];
+
+                auto it = obstacles.upper_bound(x);
+
+                int prev = *(--it);
+
+                int mx = max(
+                    x - prev,
+                    st.query(prev)
+                );
+
+                res.push_back(sz <= mx);
+            }
+        }
+
+        return res;
+    }
+};
+☕ Java Solution
+import java.util.*;
+
+class Solution {
+
+    static class SegmentTree {
+        int n;
+        int[] tree;
+
+        SegmentTree(int size) {
+            n = 1;
+            while (n <= size) n <<= 1;
+            tree = new int[2 * n];
+        }
+
+        void update(int idx, int val) {
+            idx += n;
+            tree[idx] = val;
+
+            while (idx > 1) {
+                idx >>= 1;
+                tree[idx] = Math.max(tree[idx * 2],
+                                     tree[idx * 2 + 1]);
+            }
+        }
+
+        int query(int r) {
+            int res = 0;
+
+            int l = n;
+            int rr = r + n + 1;
+
+            while (l < rr) {
+
+                if ((l & 1) == 1)
+                    res = Math.max(res, tree[l++]);
+
+                if ((rr & 1) == 1)
+                    res = Math.max(res, tree[--rr]);
+
+                l >>= 1;
+                rr >>= 1;
+            }
+
+            return res;
+        }
+    }
+
+    public List<Boolean> getResults(int[][] queries) {
+
+        int maxX = 0;
+
+        for (int[] q : queries)
+            maxX = Math.max(maxX, q[1]);
+
+        SegmentTree st = new SegmentTree(maxX + 1);
+
+        TreeSet<Integer> obstacles = new TreeSet<>();
+        obstacles.add(0);
+
+        List<Boolean> ans = new ArrayList<>();
+
+        for (int[] q : queries) {
+
+            if (q[0] == 1) {
+
+                int x = q[1];
+
+                Integer next = obstacles.ceiling(x);
+                Integer prev = obstacles.lower(x);
+
+                st.update(x, x - prev);
+
+                if (next != null)
+                    st.update(next, next - x);
+
+                obstacles.add(x);
+            }
+            else {
+
+                int x = q[1];
+                int sz = q[2];
+
+                Integer prev = obstacles.floor(x);
+
+                int mx = Math.max(
+                        x - prev,
+                        st.query(prev)
+                );
+
+                ans.add(sz <= mx);
+            }
+        }
+
+        return ans;
+    }
+}
+🐍 Python Solution
+from bisect import bisect_left, bisect_right, insort
+
+class SegmentTree:
+    def __init__(self, size):
+        self.n = 1
+        while self.n <= size:
+            self.n *= 2
+
+        self.tree = [0] * (2 * self.n)
+
+    def update(self, idx, val):
+        idx += self.n
+        self.tree[idx] = val
+
+        while idx > 1:
+            idx //= 2
+            self.tree[idx] = max(
+                self.tree[2 * idx],
+                self.tree[2 * idx + 1]
+            )
+
+    def query(self, r):
+        res = 0
+
+        l = self.n
+        rr = r + self.n + 1
+
+        while l < rr:
+
+            if l & 1:
+                res = max(res, self.tree[l])
+                l += 1
+
+            if rr & 1:
+                rr -= 1
+                res = max(res, self.tree[rr])
+
+            l //= 2
+            rr //= 2
+
+        return res
+
+
+class Solution:
+    def getResults(self, queries):
+
+        max_x = max(q[1] for q in queries)
+
+        st = SegmentTree(max_x + 1)
+
+        obstacles = [0]
+        ans = []
+
+        for q in queries:
+
+            if q[0] == 1:
+
+                x = q[1]
+
+                pos = bisect_left(obstacles, x)
+
+                nxt = obstacles[pos] if pos < len(obstacles) else None
+                prev = obstacles[pos - 1]
+
+                st.update(x, x - prev)
+
+                if nxt is not None:
+                    st.update(nxt, nxt - x)
+
+                insort(obstacles, x)
+
+            else:
+
+                x, sz = q[1], q[2]
+
+                pos = bisect_right(obstacles, x) - 1
+                prev = obstacles[pos]
+
+                mx = max(
+                    x - prev,
+                    st.query(prev)
+                )
+
+                ans.append(sz <= mx)
+
+        return ans
+⏱️ Complexity Analysis
+
+Let:
+
+n = number of queries
+Time Complexity
+Insertion : O(log n)
+Query     : O(log n)
+
+Total     : O(n log n)
+Space Complexity
+O(n)
+
+For:
+
+Segment Tree
+Obstacle Set
+🧠 Key Insight
+
+The challenge is dynamically maintaining the largest free interval while obstacles are continuously inserted.
+
+Using:
+
+Ordered Set → locate neighboring obstacles
+Segment Tree → maintain maximum gap lengths
+
+allows every operation to be processed efficiently in logarithmic time.
+
+🚀 Tags
+
+Segment Tree Ordered Set Binary Search Range Query Data Structures
+
+📌 Author
+Supriya Biradar
