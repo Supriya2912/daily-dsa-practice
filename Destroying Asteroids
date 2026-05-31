@@ -1,0 +1,147 @@
+# ☄️ Destroying Asteroids
+
+## 🧩 Problem Statement
+
+You are given:
+
+- An integer `mass` representing the initial mass of a planet.
+- An integer array `asteroids`, where `asteroids[i]` is the mass of the `i-th` asteroid.
+
+The planet can destroy an asteroid if:
+
+```text
+planet_mass >= asteroid_mass
+After destroying an asteroid, the planet's mass increases by the asteroid's mass.
+
+Determine whether the planet can destroy all asteroids in some order.
+
+Return:
+
+true if all asteroids can be destroyed.
+false otherwise.
+📥 Input
+mass → Initial mass of the planet.
+asteroids → Array of asteroid masses.
+📤 Output
+true if all asteroids can be destroyed.
+false otherwise.
+🧪 Example 1
+Input
+mass = 10
+asteroids = [3,9,19,5,21]
+Output
+true
+Explanation
+
+Sort asteroids:
+
+[3,5,9,19,21]
+
+Process:
+
+10 + 3  = 13
+13 + 5  = 18
+18 + 9  = 27
+27 + 19 = 46
+46 + 21 = 67
+
+All asteroids can be destroyed.
+
+🧪 Example 2
+Input
+mass = 5
+asteroids = [4,9,23,4]
+Output
+false
+Explanation
+
+After sorting:
+
+[4,4,9,23]
+
+Process:
+
+5 + 4 = 9
+9 + 4 = 13
+13 + 9 = 22
+
+Cannot destroy asteroid 23.
+
+💡 Approach (Greedy + Sorting)
+
+To maximize the planet's growth:
+
+Destroy the smallest asteroids first.
+Each destroyed asteroid increases the planet's mass.
+If at any point the current mass is smaller than the asteroid mass, return false.
+
+Sorting guarantees the best possible order.
+
+✅ C++ Solution
+class Solution {
+public:
+    bool asteroidsDestroyed(int mass, vector<int>& asteroids) {
+        sort(asteroids.begin(), asteroids.end());
+
+        long long cur = mass;
+
+        for (int a : asteroids) {
+            if (cur < a) return false;
+            cur += a;
+        }
+
+        return true;
+    }
+};
+☕ Java Solution
+import java.util.Arrays;
+
+class Solution {
+    public boolean asteroidsDestroyed(int mass, int[] asteroids) {
+
+        Arrays.sort(asteroids);
+
+        long current = mass;
+
+        for (int asteroid : asteroids) {
+            if (current < asteroid) {
+                return false;
+            }
+            current += asteroid;
+        }
+
+        return true;
+    }
+}
+🐍 Python Solution
+class Solution:
+    def asteroidsDestroyed(self, mass: int, asteroids: list[int]) -> bool:
+
+        asteroids.sort()
+
+        current = mass
+
+        for asteroid in asteroids:
+            if current < asteroid:
+                return False
+
+            current += asteroid
+
+        return True
+⏱️ Complexity Analysis
+Time Complexity
+O(n log n)
+Sorting the asteroids dominates the complexity.
+Space Complexity
+O(1)
+Ignoring the space used by sorting.
+🧠 Key Insight
+
+Destroying smaller asteroids first is always optimal because it increases the planet's mass as quickly as possible, making it easier to absorb larger asteroids later.
+
+🚀 Tags
+
+Greedy Sorting Simulation
+
+📌 Author
+Supriya Biradar
