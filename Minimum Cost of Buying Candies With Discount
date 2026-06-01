@@ -1,0 +1,215 @@
+# 🍬 Minimum Cost of Buying Candies With Discount
+
+## 🧩 Problem Statement
+
+A store offers a special discount:
+
+> For every three candies purchased, you only pay for the two most expensive candies and get the cheapest one for free.
+
+You are given an integer array `cost` where `cost[i]` represents the cost of the `i-th` candy.
+
+Return the **minimum total cost** needed to buy all candies.
+
+---
+
+## 📥 Input
+
+- `cost` → Array of candy prices.
+
+## 📤 Output
+
+- Minimum amount required to purchase all candies.
+
+---
+
+## 🧪 Example 1
+
+### Input
+
+```text
+cost = [1,2,3]
+```
+
+### Output
+
+```text
+5
+```
+
+### Explanation
+
+Buy all three candies together:
+
+```text
+3, 2, 1
+```
+
+The cheapest candy (`1`) is free.
+
+Total cost:
+
+```text
+3 + 2 = 5
+```
+
+---
+
+## 🧪 Example 2
+
+### Input
+
+```text
+cost = [6,5,7,9,2,2]
+```
+
+### Output
+
+```text
+23
+```
+
+### Explanation
+
+Sort in descending order:
+
+```text
+9, 7, 6, 5, 2, 2
+```
+
+Groups:
+
+```text
+(9,7,6) → pay 9 + 7
+(5,2,2) → pay 5 + 2
+```
+
+Total:
+
+```text
+9 + 7 + 5 + 2 = 23
+```
+
+---
+
+# 💡 Approach (Greedy)
+
+To maximize the discount:
+
+1. Sort candies in **descending order**.
+2. Process candies in groups of three.
+3. In every group:
+   - Pay for the first two candies.
+   - Skip the third candy (free).
+
+This ensures the free candy is always the cheapest within the group.
+
+---
+
+# ✅ C++ Solution
+
+```cpp
+class Solution {
+public:
+    int minimumCost(vector<int>& cost) {
+        sort(cost.begin(), cost.end(), greater<int>());
+
+        int total = 0;
+
+        for (int i = 0; i < cost.size(); i++) {
+            if (i % 3 != 2) {   // Every third candy is free
+                total += cost[i];
+            }
+        }
+
+        return total;
+    }
+};
+```
+
+---
+
+# ☕ Java Solution
+
+```java
+import java.util.*;
+
+class Solution {
+    public int minimumCost(int[] cost) {
+
+        Integer[] candies = Arrays.stream(cost)
+                                  .boxed()
+                                  .toArray(Integer[]::new);
+
+        Arrays.sort(candies, Collections.reverseOrder());
+
+        int total = 0;
+
+        for (int i = 0; i < candies.length; i++) {
+            if (i % 3 != 2) {
+                total += candies[i];
+            }
+        }
+
+        return total;
+    }
+}
+```
+
+---
+
+# 🐍 Python Solution
+
+```python
+class Solution:
+    def minimumCost(self, cost: list[int]) -> int:
+
+        cost.sort(reverse=True)
+
+        total = 0
+
+        for i in range(len(cost)):
+            if i % 3 != 2:
+                total += cost[i]
+
+        return total
+```
+
+---
+
+# ⏱️ Complexity Analysis
+
+### Time Complexity
+
+```text
+O(n log n)
+```
+
+- Sorting the array dominates the runtime.
+
+### Space Complexity
+
+```text
+O(1)
+```
+
+- Ignoring the space used by sorting.
+
+---
+
+# 🧠 Key Insight
+
+To maximize savings, the free candy should be as expensive as possible.
+
+Sorting in descending order ensures that in every group of three candies, the third candy (which becomes free) has the highest possible value among the remaining candies.
+
+---
+
+# 🚀 Tags
+
+`Greedy` `Sorting` `Array`
+
+---
+
+# 📌 Author
+
+- Supriya Biradar
