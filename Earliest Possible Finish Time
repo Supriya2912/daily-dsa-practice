@@ -1,0 +1,365 @@
+# ⏱️ Earliest Possible Finish Time
+
+## 🧩 Problem Statement
+
+You are given two sets of rides:
+
+### Land Rides
+- `landStartTime[i]` → earliest start time of the `i-th` land ride.
+- `landDuration[i]` → duration of the `i-th` land ride.
+
+### Water Rides
+- `waterStartTime[i]` → earliest start time of the `i-th` water ride.
+- `waterDuration[i]` → duration of the `i-th` water ride.
+
+A visitor must complete:
+
+1. Exactly one land ride
+2. Exactly one water ride
+
+The rides can be taken in **any order**:
+
+- Land → Water
+- Water → Land
+
+A ride can only start at or after its start time.
+
+Return the **earliest possible time** at which both rides can be completed.
+
+---
+
+## 📥 Input
+
+- `landStartTime` → start times of land rides
+- `landDuration` → durations of land rides
+- `waterStartTime` → start times of water rides
+- `waterDuration` → durations of water rides
+
+## 📤 Output
+
+- Earliest finish time after completing one land ride and one water ride.
+
+---
+
+## 🧪 Example
+
+### Input
+
+```text
+landStartTime = [1, 5]
+landDuration  = [3, 2]
+
+waterStartTime = [2, 6]
+waterDuration  = [4, 1]
+```
+
+### Output
+
+```text
+6
+```
+
+### Explanation
+
+Land Ride:
+
+```text
+Ride 0: starts at 1, ends at 4
+Ride 1: starts at 5, ends at 7
+```
+
+Water Ride:
+
+```text
+Ride 0: starts at 2, duration 4
+Ride 1: starts at 6, duration 1
+```
+
+Choose:
+
+```text
+Land Ride 0 → finish at 4
+Water Ride 1 → starts at 6
+Finish = 7
+```
+
+Or:
+
+```text
+Water Ride 0 → finish at 6
+Land Ride 1 → starts at 5
+Finish = 7
+```
+
+Minimum possible finish time is computed by checking both orders.
+
+---
+
+# 💡 Approach
+
+Instead of checking every pair of rides, observe:
+
+### Step 1
+
+Find the earliest finishing ride in each category.
+
+```cpp
+minLandEnd  = min(start + duration)
+minWaterEnd = min(start + duration)
+```
+
+### Step 2
+
+Try:
+
+#### Land → Water
+
+If a water ride starts before the earliest land ride finishes:
+
+```text
+Finish = minLandEnd + waterDuration
+```
+
+Otherwise:
+
+```text
+Finish = waterStartTime + waterDuration
+```
+
+#### Water → Land
+
+Similarly:
+
+```text
+Finish = minWaterEnd + landDuration
+```
+
+or
+
+```text
+Finish = landStartTime + landDuration
+```
+
+Take the minimum over all possibilities.
+
+---
+
+# ✅ C++ Solution
+
+```cpp
+class Solution {
+public:
+    static int earliestFinishTime(
+        vector<int>& landStartTime,
+        vector<int>& landDuration,
+        vector<int>& waterStartTime,
+        vector<int>& waterDuration) {
+
+        const int n = landStartTime.size();
+        const int m = waterStartTime.size();
+
+        int minLandEnd = 1e6;
+        int minWaterEnd = 1e6;
+
+        // Earliest finishing land ride
+        for (int i = 0; i < n; i++) {
+            minLandEnd = min(
+                minLandEnd,
+                landStartTime[i] + landDuration[i]
+            );
+        }
+
+        // Earliest finishing water ride
+        for (int i = 0; i < m; i++) {
+            minWaterEnd = min(
+                minWaterEnd,
+                waterStartTime[i] + waterDuration[i]
+            );
+        }
+
+        int ans = 1e9;
+
+        // Land -> Water
+        for (int i = 0; i < m; i++) {
+
+            if (waterStartTime[i] < minLandEnd)
+                ans = min(ans,
+                          minLandEnd + waterDuration[i]);
+            else
+                ans = min(ans,
+                          waterStartTime[i] + waterDuration[i]);
+        }
+
+        // Water -> Land
+        for (int i = 0; i < n; i++) {
+
+            if (landStartTime[i] < minWaterEnd)
+                ans = min(ans,
+                          minWaterEnd + landDuration[i]);
+            else
+                ans = min(ans,
+                          landStartTime[i] + landDuration[i]);
+        }
+
+        return ans;
+    }
+};
+```
+
+---
+
+# ☕ Java Solution
+
+```java
+class Solution {
+
+    public int earliestFinishTime(
+            int[] landStartTime,
+            int[] landDuration,
+            int[] waterStartTime,
+            int[] waterDuration) {
+
+        int minLandEnd = Integer.MAX_VALUE;
+        int minWaterEnd = Integer.MAX_VALUE;
+
+        for (int i = 0; i < landStartTime.length; i++) {
+            minLandEnd = Math.min(
+                minLandEnd,
+                landStartTime[i] + landDuration[i]
+            );
+        }
+
+        for (int i = 0; i < waterStartTime.length; i++) {
+            minWaterEnd = Math.min(
+                minWaterEnd,
+                waterStartTime[i] + waterDuration[i]
+            );
+        }
+
+        int ans = Integer.MAX_VALUE;
+
+        // Land -> Water
+        for (int i = 0; i < waterStartTime.length; i++) {
+
+            if (waterStartTime[i] < minLandEnd)
+                ans = Math.min(
+                    ans,
+                    minLandEnd + waterDuration[i]
+                );
+            else
+                ans = Math.min(
+                    ans,
+                    waterStartTime[i] + waterDuration[i]
+                );
+        }
+
+        // Water -> Land
+        for (int i = 0; i < landStartTime.length; i++) {
+
+            if (landStartTime[i] < minWaterEnd)
+                ans = Math.min(
+                    ans,
+                    minWaterEnd + landDuration[i]
+                );
+            else
+                ans = Math.min(
+                    ans,
+                    landStartTime[i] + landDuration[i]
+                );
+        }
+
+        return ans;
+    }
+}
+```
+
+---
+
+# 🐍 Python Solution
+
+```python
+class Solution:
+    def earliestFinishTime(
+        self,
+        landStartTime,
+        landDuration,
+        waterStartTime,
+        waterDuration
+    ):
+
+        min_land_end = min(
+            s + d
+            for s, d in zip(landStartTime, landDuration)
+        )
+
+        min_water_end = min(
+            s + d
+            for s, d in zip(waterStartTime, waterDuration)
+        )
+
+        ans = float('inf')
+
+        # Land -> Water
+        for s, d in zip(waterStartTime, waterDuration):
+
+            if s < min_land_end:
+                ans = min(ans, min_land_end + d)
+            else:
+                ans = min(ans, s + d)
+
+        # Water -> Land
+        for s, d in zip(landStartTime, landDuration):
+
+            if s < min_water_end:
+                ans = min(ans, min_water_end + d)
+            else:
+                ans = min(ans, s + d)
+
+        return ans
+```
+
+---
+
+# ⏱️ Complexity Analysis
+
+### Time Complexity
+
+```text
+O(n + m)
+```
+
+- One pass to find earliest finishing rides.
+- One pass to evaluate both ride orders.
+
+### Space Complexity
+
+```text
+O(1)
+```
+
+Only a few variables are used.
+
+---
+
+# 🧠 Key Insight
+
+The optimal schedule only depends on:
+
+```text
+Earliest finishing land ride
+Earliest finishing water ride
+```
+
+Rather than checking every pair of rides (`O(n × m)`), we can compute the answer in linear time by leveraging the earliest completion times of each category.
+
+---
+
+# 🚀 Tags
+
+`Greedy` `Arrays` `Simulation` `Scheduling`
+
+---
+
+# 📌 Author
+
+- supriya biradar
