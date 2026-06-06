@@ -1,0 +1,81 @@
+# Left and Right Difference (LeetCode 2574)
+
+## 📌 Problem Statement
+
+You are given a 0-indexed integer array `nums`.
+
+For each index `i` in the array, calculate the absolute difference between:
+
+- The sum of elements to the left of index `i`
+- The sum of elements to the right of index `i`
+
+Return an array `answer` where `answer[i]` is the absolute difference between these two sums.
+
+### Formally:
+- `leftSum = sum(nums[0] ... nums[i-1])`
+- `rightSum = sum(nums[i+1] ... nums[n-1])`
+- `answer[i] = |leftSum - rightSum|`
+
+---
+
+## 🧠 Approach
+
+### Key Idea: Prefix + Running Total
+
+Instead of recomputing left and right sums for every index (which would be O(n²)), we optimize using a running sum approach.
+
+### Steps:
+
+1. First compute the total sum of the array → this acts as initial `rightSum`.
+2. Initialize `leftSum = 0`.
+3. Iterate through the array:
+   - Remove current element from `rightSum`
+   - Compute `abs(leftSum - rightSum)`
+   - Add current element to `leftSum`
+
+---
+
+## ⏱️ Complexity Analysis
+
+- **Time Complexity:** `O(n)`  
+  We traverse the array once.
+
+- **Space Complexity:** `O(1)` (excluding output array)
+
+---
+
+## 💻 Code (C++)
+
+```cpp
+class Solution {
+public:
+    vector<int> leftRightDifference(vector<int>& nums) {
+        int n = nums.size();
+
+        int rightSum = 0;
+        for (int num : nums) {
+            rightSum += num;
+        }
+
+        int leftSum = 0;
+        vector<int> ans(n);
+
+        for (int i = 0; i < n; i++) {
+            rightSum -= nums[i];
+            ans[i] = abs(leftSum - rightSum);
+            leftSum += nums[i];
+        }
+
+        return ans;
+    }
+};
+
+🚀 Example
+Input:
+nums = [10, 4, 8, 3]
+Output:
+[15, 1, 11, 22]
+📚 Concept Used
+Prefix Sum
+Running Total Optimization
+Array Traversal
