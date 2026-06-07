@@ -1,0 +1,171 @@
+# Create Binary Tree From Descriptions (LeetCode 2196)
+
+## 📌 Problem Statement
+
+You are given a 2D integer array `descriptions` where:
+
+* `descriptions[i] = [parent, child, isLeft]`
+* `parent` is the value of a parent node.
+* `child` is the value of a child node.
+* `isLeft` indicates whether the child is a left child (`1`) or a right child (`0`).
+
+Construct and return the root of the binary tree described by `descriptions`.
+
+It is guaranteed that the given descriptions form a valid binary tree.
+
+---
+
+## 🧠 Approach
+
+### 1. Create Nodes Dynamically
+
+Use a hash map (`unordered_map<int, TreeNode*>`) to store all nodes.
+
+For every description:
+
+* If the parent node does not exist, create it.
+* If the child node does not exist, create it.
+
+This ensures each value corresponds to exactly one `TreeNode`.
+
+### 2. Connect Parent and Child
+
+Based on the value of `isLeft`:
+
+* `1` → attach the child as the left child.
+* `0` → attach the child as the right child.
+
+### 3. Identify the Root
+
+A root node is the only node that never appears as a child.
+
+Use another hash map to track:
+
+* Parent nodes → mark as potential roots.
+* Child nodes → mark as non-roots.
+
+After processing all descriptions, the node marked as a parent but never as a child is the root.
+
+### 4. Return the Root Node
+
+Retrieve the root value and return the corresponding node from the node map.
+
+---
+
+## 💻 Code (C++)
+
+```cpp
+class Solution {
+public:
+    TreeNode* createBinaryTree(vector<vector<int>>& descriptions) {
+        unordered_map<int, TreeNode*> mp;
+        unordered_map<int, int> root;
+
+        for (int i = 0; i < descriptions.size(); i++) {
+
+            if (mp[descriptions[i][0]] == 0) {
+                TreeNode* temp = new TreeNode(descriptions[i][0]);
+                mp[descriptions[i][0]] = temp;
+            }
+
+            if (mp[descriptions[i][1]] == 0) {
+                TreeNode* temp = new TreeNode(descriptions[i][1]);
+                mp[descriptions[i][1]] = temp;
+            }
+
+            if (descriptions[i][2] == 1) {
+                mp[descriptions[i][0]]->left = mp[descriptions[i][1]];
+            } else {
+                mp[descriptions[i][0]]->right = mp[descriptions[i][1]];
+            }
+
+            if (root[descriptions[i][0]] != -1) {
+                root[descriptions[i][0]] = 1;
+            }
+
+            root[descriptions[i][1]] = -1;
+        }
+
+        int value = 0;
+
+        for (auto &it : root) {
+            if (it.second == 1) {
+                value = it.first;
+                break;
+            }
+        }
+
+        return mp[value];
+    }
+};
+```
+
+---
+
+## 🚀 Example
+
+### Input
+
+```text
+descriptions = [[20,15,1],[20,17,0],[50,20,1],[50,80,0],[80,19,1]]
+```
+
+### Constructed Tree
+
+```text
+        50
+       /  \
+      20   80
+     / \   /
+    15 17 19
+```
+
+### Output
+
+```text
+[50,20,80,15,17,19]
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+### Time Complexity
+
+* Creating nodes and connecting them: **O(n)**
+* Finding the root: **O(n)**
+
+Overall:
+
+```text
+O(n)
+```
+
+where `n` is the number of descriptions.
+
+### Space Complexity
+
+* Node map: **O(n)**
+* Root tracking map: **O(n)**
+
+Overall:
+
+```text
+O(n)
+```
+
+---
+
+## 🔑 Key Concepts
+
+* Binary Tree Construction
+* Hash Maps (`unordered_map`)
+* Parent-Child Relationships
+* Root Identification
+* Graph Representation using Nodes
+
+---
+
+## 🏷️ Tags
+
+`Binary Tree` `Hash Map` `Tree Construction` `DFS/BFS` `LeetCode 2196`
