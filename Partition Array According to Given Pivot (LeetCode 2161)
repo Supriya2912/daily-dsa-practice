@@ -1,0 +1,137 @@
+# Partition Array According to Given Pivot (LeetCode 2161)
+
+## 📌 Problem Statement
+
+You are given a 0-indexed integer array `nums` and an integer `pivot`.
+
+Rearrange the elements of `nums` such that:
+
+* Every element less than `pivot` appears before every element greater than `pivot`.
+* Every element equal to `pivot` appears between the elements less than and greater than `pivot`.
+* The relative order of elements less than `pivot` and greater than `pivot` is preserved.
+
+Return the resulting array.
+
+---
+
+## 🧠 Approach
+
+### Two-Pointer Construction
+
+Instead of creating three separate arrays for:
+
+* Elements less than `pivot`
+* Elements equal to `pivot`
+* Elements greater than `pivot`
+
+we directly build the answer array using two pointers:
+
+* `left` → next position for elements smaller than `pivot`
+* `right` → next position for elements greater than `pivot`
+
+### Steps
+
+1. Initialize an answer array of the same size as `nums`.
+2. Traverse from:
+
+   * Left to right for elements `< pivot`
+   * Right to left for elements `> pivot`
+3. Place:
+
+   * Smaller elements at the beginning using `left`
+   * Greater elements at the end using `right`
+4. After processing all elements, the remaining positions must contain values equal to `pivot`.
+5. Fill those positions with `pivot`.
+
+This preserves the relative ordering of elements less than and greater than the pivot.
+
+---
+
+## 💻 Code (C++)
+
+```cpp
+class Solution {
+public:
+    vector<int> pivotArray(vector<int>& nums, int pivot) {
+        vector<int> result(nums.size(), 0);
+        int left = 0, right = nums.size() - 1;
+        
+        for (int i = 0, j = nums.size() - 1; i < nums.size(); ++i, --j) {
+            if (nums[i] < pivot) {
+                result[left] = nums[i];
+                left++;
+            }
+            
+            if (nums[j] > pivot) {
+                result[right] = nums[j];
+                right--;
+            }
+        }
+        
+        while (left <= right) {
+            result[left] = pivot;
+            left++;
+        }
+        
+        return result;
+    }
+};
+```
+
+---
+
+## 🚀 Example
+
+### Input
+
+```text
+nums = [9,12,5,10,14,3,10]
+pivot = 10
+```
+
+### Processing
+
+* Elements < 10 → `[9,5,3]`
+* Elements = 10 → `[10,10]`
+* Elements > 10 → `[12,14]`
+
+### Output
+
+```text
+[9,5,3,10,10,12,14]
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+### Time Complexity
+
+```text
+O(n)
+```
+
+The array is traversed once.
+
+### Space Complexity
+
+```text
+O(n)
+```
+
+An additional result array is used.
+
+---
+
+## 🔑 Key Concepts
+
+* Two Pointers
+* Array Partitioning
+* Stable Ordering
+* Simulation
+
+---
+
+## 🏷️ Tags
+
+`Array` `Two Pointers` `Partitioning` `Simulation` `LeetCode 2161`
