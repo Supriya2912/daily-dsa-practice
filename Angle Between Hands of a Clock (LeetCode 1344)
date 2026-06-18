@@ -1,0 +1,156 @@
+# Angle Between Hands of a Clock (LeetCode 1344)
+
+## 📌 Problem Statement
+
+Given two integers:
+
+* `hour` (1 to 12)
+* `minutes` (0 to 59)
+
+Return the smaller angle (in degrees) formed between the hour hand and the minute hand of an analog clock.
+
+The answer is accepted if it is within `10^-5` of the actual answer.
+
+---
+
+## 🧠 Approach
+
+### Calculate the Position of Both Hands
+
+#### Hour Hand
+
+The hour hand moves:
+
+* `30°` per hour (`360° / 12`)
+* `0.5°` per minute (`30° / 60`)
+
+So its angle from 12 o'clock is:
+
+#### Minute Hand
+
+The minute hand moves:
+
+* `6°` per minute (`360° / 60`)
+
+So its angle is:
+
+### Find the Difference
+
+Compute the absolute difference between the two angles:
+
+```text
+diff = |hourAngle - minuteAngle|
+```
+
+Since there are always two angles between the hands, return the smaller one:
+
+```text
+min(diff, 360 - diff)
+```
+
+---
+
+## 💻 Code (C++)
+
+```cpp
+class Solution {
+public:
+    double angleClock(int hour, int minutes) {
+        double hourAngle = 30.0 * hour + 0.5 * minutes;
+        double minuteAngle = 6.0 * minutes;
+
+        double diff = abs(hourAngle - minuteAngle);
+
+        return min(diff, 360 - diff);
+    }
+};
+```
+
+---
+
+## 🚀 Example
+
+### Example 1
+
+**Input**
+
+```text
+hour = 12
+minutes = 30
+```
+
+**Calculation**
+
+* Hour hand = 15°
+* Minute hand = 180°
+
+```text
+|15 - 180| = 165
+```
+
+**Output**
+
+```text
+165
+```
+
+---
+
+### Example 2
+
+**Input**
+
+```text
+hour = 3
+minutes = 15
+```
+
+**Calculation**
+
+* Hour hand = 97.5°
+* Minute hand = 90°
+
+```text
+|97.5 - 90| = 7.5
+```
+
+**Output**
+
+```text
+7.5
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+### Time Complexity
+
+```text
+O(1)
+```
+
+Only a few arithmetic operations are performed.
+
+### Space Complexity
+
+```text
+O(1)
+```
+
+No extra space is used.
+
+---
+
+## 🔑 Key Concepts
+
+* Geometry
+* Clock Mathematics
+* Angle Calculation
+* Simulation
+
+---
+
+## 🏷️ Tags
+
+`Math` `Geometry` `Simulation` `Clock` `LeetCode 1344`
