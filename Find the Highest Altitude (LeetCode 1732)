@@ -1,0 +1,114 @@
+# Find the Highest Altitude (LeetCode 1732)
+
+## 📌 Problem Statement
+
+You are given an integer array `gain` of length `n`, where `gain[i]` represents the net gain in altitude between point `i` and point `i + 1`.
+
+The biker starts at altitude `0` at point `0`.
+
+Return the highest altitude reached during the journey.
+
+---
+
+## 🧠 Approach
+
+### Prefix Sum Idea
+
+We maintain the current altitude as we traverse the array.
+
+* Start from altitude `0`
+* Keep adding each `gain[i]` to the current altitude
+* Track the maximum altitude seen so far
+
+Instead of storing all values, we can compute it in a single pass.
+
+---
+
+### Step-by-Step
+
+1. Initialize:
+
+   * `currentAltitude = 0`
+   * `maxAltitude = 0`
+
+2. For each `gain[i]`:
+
+   * Update altitude: `currentAltitude += gain[i]`
+   * Update answer: `maxAltitude = max(maxAltitude, currentAltitude)`
+
+3. Return `maxAltitude`
+
+---
+
+## 💻 Code (C++)
+
+```cpp id="m9p3x1"
+class Solution {
+public:
+    int largestAltitude(vector<int>& gain) {
+        vector<int> sol;
+        int i = 0;
+
+        sol.push_back(0);
+
+        for (int &c : gain) {
+            sol.push_back(c + sol[i]);
+            i++;
+        }
+
+        return *max_element(sol.begin(), sol.end());
+    }
+};
+```
+
+---
+
+## 🚀 Optimized Version (Recommended)
+
+Your current solution works, but we can optimize space.
+
+```cpp id="p8xq2a"
+class Solution {
+public:
+    int largestAltitude(vector<int>& gain) {
+        int current = 0;
+        int maxAlt = 0;
+
+        for (int x : gain) {
+            current += x;
+            maxAlt = max(maxAlt, current);
+        }
+
+        return maxAlt;
+    }
+};
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+### Your Approach
+
+* **Time Complexity:** `O(n)`
+* **Space Complexity:** `O(n)` (stores prefix array)
+
+### Optimized Approach
+
+* **Time Complexity:** `O(n)`
+* **Space Complexity:** `O(1)`
+
+---
+
+## 🔑 Key Concepts
+
+* Prefix Sum
+* Running Sum
+* Greedy Tracking of Maximum
+* Array Traversal
+
+---
+
+## 🏷️ Tags
+
+`Array` `Prefix Sum` `Simulation` `LeetCode 1732`
