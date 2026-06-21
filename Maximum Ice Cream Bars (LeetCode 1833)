@@ -1,0 +1,179 @@
+# Maximum Ice Cream Bars (LeetCode 1833)
+
+## 📌 Problem Statement
+
+You are given:
+
+* An array `costs` where `costs[i]` is the price of the `i-th` ice cream bar.
+* An integer `coins` representing the number of coins you have.
+
+You may buy ice cream bars in any order as long as you have enough coins.
+
+Return the maximum number of ice cream bars you can buy.
+
+---
+
+## 🧠 Approach
+
+### Counting Sort / Frequency Array
+
+The constraints allow ice cream costs up to `100000`.
+
+Instead of sorting the entire array (`O(n log n)`), we can use a frequency array to count how many bars exist for each cost.
+
+### Key Idea
+
+To maximize the number of bars purchased:
+
+* Always buy the cheapest available ice cream first.
+* Process costs in increasing order.
+* For each cost `x`, buy as many bars as possible:
+
+```text
+buy = min(coins / x, frequency[x])
+```
+
+* Update:
+
+  * Remaining coins
+  * Total bars purchased
+
+This effectively performs a counting-sort-style greedy purchase.
+
+---
+
+## 💻 Code (C++)
+
+```cpp
+constexpr int M = 1e5 + 1;
+int freq[M];
+
+class Solution {
+public:
+    static int maxIceCream(vector<int>& costs, int coins) {
+        int xMax = 0;
+
+        for (int x : costs) {
+            freq[x]++;
+            xMax = max(xMax, x);
+        }
+
+        int cnt = 0;
+
+        for (int x = 1; x <= xMax; x++) {
+            const int f = freq[x];
+
+            if (f == 0)
+                continue;
+
+            int buy = min(coins / x, f);
+
+            if (buy == 0)
+                break;
+
+            cnt += buy;
+            coins -= buy * x;
+        }
+
+        // Reset frequency array for future test cases
+        for (int x : costs)
+            freq[x] = 0;
+
+        return cnt;
+    }
+};
+
+auto init = []() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+    return 'c';
+}();
+```
+
+---
+
+## 🚀 Example
+
+### Input
+
+```text
+costs = [1,3,2,4,1]
+coins = 7
+```
+
+### Processing
+
+Frequency table:
+
+```text
+Cost 1 → 2 bars
+Cost 2 → 1 bar
+Cost 3 → 1 bar
+Cost 4 → 1 bar
+```
+
+Purchases:
+
+```text
+Buy 2 bars costing 1  → coins = 5
+Buy 1 bar costing 2   → coins = 3
+Buy 1 bar costing 3   → coins = 0
+```
+
+Total bars purchased:
+
+```text
+4
+```
+
+### Output
+
+```text
+4
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+Let:
+
+* `n` = number of ice cream bars
+* `C` = maximum cost value (`≤ 100000`)
+
+### Time Complexity
+
+* Build frequency array: `O(n)`
+* Traverse costs from `1` to `C`: `O(C)`
+
+Overall:
+
+```text
+O(n + C)
+```
+
+Since `C = 100000`, this is effectively linear.
+
+### Space Complexity
+
+```text
+O(C)
+```
+
+for the frequency array.
+
+---
+
+## 🔑 Key Concepts
+
+* Greedy Algorithm
+* Counting Sort
+* Frequency Array
+* Optimization over Sorting
+
+---
+
+## 🏷️ Tags
+
+`Greedy` `Counting Sort` `Array` `Frequency Array` `LeetCode 1833`
