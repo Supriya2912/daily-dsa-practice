@@ -1,0 +1,162 @@
+# Count Majority Subarrays
+
+## 📌 Problem Statement
+
+Given an integer array `nums` and an integer `target`, count the number of subarrays in which `target` is the **majority element**.
+
+A value is considered a majority element in a subarray if:
+
+```text
+frequency(target) > length(subarray) / 2
+```
+
+Return the total number of such subarrays.
+
+---
+
+## 🧠 Approach
+
+### Brute Force Enumeration
+
+The solution checks every possible subarray and counts how many times `target` appears within it.
+
+For each starting index:
+
+1. Initialize the frequency of `target` to `0`.
+2. Extend the subarray one element at a time.
+3. Update the frequency whenever the current element equals `target`.
+4. Compute the current subarray length.
+5. If:
+
+```text
+frequency(target) > length / 2
+```
+
+then the subarray is valid and contributes to the answer.
+
+---
+
+### Why It Works
+
+For every subarray:
+
+```text
+nums[i...j]
+```
+
+the algorithm maintains:
+
+* `freq` = number of occurrences of `target`
+* `len` = size of the subarray
+
+A subarray is counted exactly when `target` appears more than half of its length.
+
+Since all possible subarrays are examined, every valid majority subarray is counted.
+
+---
+
+## 💻 Code (C++)
+
+```cpp
+class Solution {
+public:
+    long long countMajoritySubarrays(vector<int>& nums, int target) {
+        int n = nums.size();
+        long long cnt = 0;
+
+        for (int i = 0; i < n; i++) {
+            int freq = 0;
+
+            for (int j = i; j < n; j++) {
+                if (nums[j] == target) {
+                    freq++;
+                }
+
+                int len = j - i + 1;
+
+                if (freq > len / 2) {
+                    cnt++;
+                }
+            }
+        }
+
+        return cnt;
+    }
+};
+```
+
+---
+
+## 🚀 Example
+
+### Input
+
+```text
+nums = [1, 2, 2, 2, 3]
+target = 2
+```
+
+### Valid Majority Subarrays
+
+```text
+[2]
+[2,2]
+[2,2,2]
+[2,2,2,3]
+[1,2,2]
+[1,2,2,2]
+[2]
+[2,2]
+[2,2,3]
+[2]
+...
+```
+
+Each counted subarray contains `2` more than half of the time.
+
+### Output
+
+```text
+10
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+Let:
+
+```text
+n = nums.size()
+```
+
+### Time Complexity
+
+The outer loop chooses the start index and the inner loop chooses the end index:
+
+```text
+O(n²)
+```
+
+### Space Complexity
+
+Only a few variables are used:
+
+```text
+O(1)
+```
+
+---
+
+## 🔑 Key Concepts
+
+* Brute Force
+* Nested Loops
+* Frequency Counting
+* Subarray Enumeration
+
+---
+
+## 🏷️ Tags
+
+`Array` `Brute Force` `Frequency Counting` `Subarrays`
