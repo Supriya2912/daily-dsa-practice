@@ -1,0 +1,185 @@
+# Count Majority Subarrays (Optimized Prefix Sum Approach)
+
+## 📌 Problem Statement
+
+Given an integer array `nums` and an integer `target`, count the number of subarrays in which `target` is the **majority element**.
+
+A value is considered a majority element if:
+
+```text
+frequency(target) > length(subarray) / 2
+```
+
+Return the total number of such subarrays.
+
+---
+
+## 🧠 Approach
+
+### Key Observation
+
+Instead of directly counting the frequency of `target`, transform the array as follows:
+
+* If `nums[i] == target`, treat it as **+1**.
+* Otherwise, treat it as **-1**.
+
+Now for any subarray,
+
+```text
+sum = (#target) - (#non-target)
+```
+
+If `target` is the majority:
+
+```text
+#target > #non-target
+```
+
+which is equivalent to:
+
+```text
+sum > 0
+```
+
+Therefore, the problem becomes:
+
+> **Count the number of subarrays whose transformed sum is positive.**
+
+---
+
+### Prefix Sum
+
+Maintain a running prefix balance:
+
+* `+1` when encountering `target`
+* `-1` otherwise
+
+Instead of storing negative indices, shift every prefix value by `n`:
+
+```text
+pref = n
+```
+
+This allows us to use a simple frequency array.
+
+---
+
+### Counting Valid Subarrays
+
+The algorithm keeps:
+
+* `freq[p]` → number of previous occurrences of prefix balance `p`
+* `less` → number of valid previous prefixes that produce a positive-sum subarray ending at the current index
+
+When processing an element:
+
+* If it is the target (`+1`), the prefix increases.
+* Otherwise (`-1`), the prefix decreases.
+
+The value of `less` is updated incrementally using the stored frequencies, avoiding an expensive scan over all previous prefixes.
+
+Finally:
+
+* Add the current prefix to the frequency table.
+* Add `less` to the answer.
+
+This yields an **O(n)** solution.
+
+---
+
+## 💻 Code (C++)
+
+```cpp
+class Solution {
+public:
+    long long countMajoritySubarrays(vector<int>& nums, int target) {
+        int size = nums.size(), pref = size;
+
+        vector<int> freq(2 * size + 1);
+        freq[size] = 1;
+
+        long long less = 0, ans = 0;
+
+        for (int num : nums) {
+            if (num == target)
+                less += freq[pref++];
+            else
+                less -= freq[--pref];
+
+            ++freq[pref];
+            ans += less;
+        }
+
+        return ans;
+    }
+};
+```
+
+---
+
+## 🚀 Example
+
+### Input
+
+```text
+nums = [2,1,2]
+target = 2
+```
+
+### Transformation
+
+```text
+[+1, -1, +1]
+```
+
+Prefix balances:
+
+```text
+0 → 1 → 0 → 1
+```
+
+The algorithm efficiently counts every subarray whose transformed sum is positive, corresponding to subarrays where `2` is the majority.
+
+### Output
+
+```text
+3
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+Let `n` be the size of the array.
+
+### Time Complexity
+
+```text
+O(n)
+```
+
+Each element is processed exactly once.
+
+### Space Complexity
+
+```text
+O(n)
+```
+
+The frequency array stores prefix balance counts.
+
+---
+
+## 🔑 Key Concepts
+
+* Prefix Sum
+* Balance Transformation (+1 / -1)
+* Frequency Array
+* Running Count Optimization
+* Linear-Time Counting
+
+---
+
+## 🏷️ Tags
+
+`Array` `Prefix Sum` `Hashing` `Counting` `Optimization` `LeetCode`
