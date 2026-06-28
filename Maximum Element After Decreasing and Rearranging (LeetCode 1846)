@@ -1,0 +1,191 @@
+# Maximum Element After Decreasing and Rearranging (LeetCode 1846)
+
+## 📌 Problem Statement
+
+You are given an integer array `arr`.
+
+You may perform the following operations any number of times:
+
+* Rearrange the elements of the array.
+* Decrease the value of any element to any smaller positive integer.
+
+After performing these operations, the array must satisfy:
+
+* The first element is `1`.
+* The absolute difference between every pair of adjacent elements is at most `1`.
+
+Return the **maximum possible value of the largest element** in the resulting array.
+
+---
+
+## 🧠 Approach
+
+### Greedy Strategy
+
+To maximize the largest element while satisfying the constraints:
+
+1. **Sort** the array.
+2. Set the smallest element to `1`.
+3. Traverse the sorted array:
+
+   * If the current element is more than `1` greater than the previous element, reduce it to:
+
+```text
+previous + 1
+```
+
+* Otherwise, keep it unchanged.
+
+This ensures every adjacent pair differs by at most `1` while keeping each element as large as possible.
+
+---
+
+### Why It Works
+
+After sorting:
+
+* The smallest element should always become `1`.
+* Every subsequent element should be as large as possible while satisfying:
+
+```text
+arr[i] ≤ arr[i-1] + 1
+```
+
+If an element already satisfies this condition, no modification is needed.
+
+Otherwise, decreasing it to `arr[i-1] + 1` is optimal because increasing is not allowed.
+
+Thus, the final element is the maximum achievable value.
+
+---
+
+## 💻 Code (C++)
+
+```cpp
+class Solution {
+public:
+    int maximumElementAfterDecrementingAndRearranging(vector<int>& arr) {
+        sort(arr.begin(), arr.end());
+
+        int n = arr.size();
+
+        arr[0] = 1;
+
+        for (int i = 1; i < n; i++) {
+            if (arr[i] - arr[i - 1] > 1)
+                arr[i] = arr[i - 1] + 1;
+        }
+
+        return arr.back();
+    }
+};
+
+auto init = []() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+    return 'c';
+}();
+```
+
+---
+
+## 🚀 Example
+
+### Input
+
+```text
+arr = [2,2,1,2,1]
+```
+
+### After Sorting
+
+```text
+[1,1,2,2,2]
+```
+
+### After Adjustment
+
+```text
+[1,1,2,2,2]
+```
+
+Largest element:
+
+```text
+2
+```
+
+### Output
+
+```text
+2
+```
+
+---
+
+### Example 2
+
+**Input**
+
+```text
+arr = [100,1,1000]
+```
+
+**After Sorting**
+
+```text
+[1,100,1000]
+```
+
+**After Adjustment**
+
+```text
+[1,2,3]
+```
+
+**Output**
+
+```text
+3
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+Let `n` be the size of the array.
+
+### Time Complexity
+
+* Sorting: **O(n log n)**
+* Single traversal: **O(n)**
+
+Overall:
+
+```text
+O(n log n)
+```
+
+### Space Complexity
+
+```text
+O(1)
+```
+
+Ignoring the space used by the sorting algorithm.
+
+---
+
+## 🔑 Key Concepts
+
+* Greedy Algorithm
+* Sorting
+* Array Manipulation
+* Simulation
+
+---
+
+## 🏷️ Tags
+
+`Greedy` `Sorting` `Array` `Simulation` `LeetCode 1846`
