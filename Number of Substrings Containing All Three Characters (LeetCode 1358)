@@ -1,0 +1,174 @@
+# Number of Substrings Containing All Three Characters (LeetCode 1358)
+
+## 📌 Problem Statement
+
+Given a string `s` consisting only of the characters:
+
+```text
+'a', 'b', 'c'
+```
+
+Return the number of substrings that contain **at least one occurrence** of each character (`'a'`, `'b'`, and `'c'`).
+
+---
+
+## 🧠 Approach
+
+### Sliding Window (Two Pointers)
+
+Maintain a sliding window `[left, right]` that expands to the right.
+
+Use a frequency array of size `3` to store the count of:
+
+* `freq[0]` → `'a'`
+* `freq[1]` → `'b'`
+* `freq[2]` → `'c'`
+
+Whenever the current window contains all three characters, we have found a valid substring.
+
+---
+
+### Key Observation
+
+Suppose the current window:
+
+```text
+[left ... right]
+```
+
+already contains `'a'`, `'b'`, and `'c'`.
+
+Then **every substring** starting at `left` and ending at:
+
+```text
+right, right+1, ..., n-1
+```
+
+will also contain all three characters.
+
+Therefore, instead of counting one substring, we can add:
+
+```text
+n - right
+```
+
+to the answer.
+
+After counting these substrings, shrink the window from the left to search for more valid windows.
+
+---
+
+### Algorithm
+
+1. Initialize:
+
+   * `left = 0`
+   * Frequency array for `'a'`, `'b'`, `'c'`
+2. Expand the window by moving `right`.
+3. Update the frequency of the current character.
+4. While the window contains all three characters:
+
+   * Add `n - right` to the answer.
+   * Remove the leftmost character.
+   * Move `left` forward.
+5. Continue until the end of the string.
+
+---
+
+## 💻 Code (C++)
+
+```cpp
+class Solution {
+public:
+    int numberOfSubstrings(string s) {
+        int n = s.size();
+
+        vector<int> freq(3, 0);
+
+        int left = 0;
+        int ans = 0;
+
+        for (int right = 0; right < n; right++) {
+            freq[s[right] - 'a']++;
+
+            while (freq[0] && freq[1] && freq[2]) {
+                ans += (n - right);
+                freq[s[left] - 'a']--;
+                left++;
+            }
+        }
+
+        return ans;
+    }
+};
+```
+
+---
+
+## 🚀 Example
+
+### Input
+
+```text
+s = "abcabc"
+```
+
+### Valid Substrings
+
+Some valid substrings are:
+
+```text
+"abc"
+"abca"
+"abcab"
+"abcabc"
+"bca"
+"bcab"
+"bcabc"
+"cab"
+...
+```
+
+### Output
+
+```text
+10
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+Let `n` be the length of the string.
+
+### Time Complexity
+
+```text
+O(n)
+```
+
+Each character is added to and removed from the sliding window at most once.
+
+### Space Complexity
+
+```text
+O(1)
+```
+
+Only a frequency array of size `3` is used.
+
+---
+
+## 🔑 Key Concepts
+
+* Sliding Window
+* Two Pointers
+* Frequency Counting
+* String Processing
+* Greedy Counting
+
+---
+
+## 🏷️ Tags
+
+`String` `Sliding Window` `Two Pointers` `Hashing` `LeetCode 1358`
