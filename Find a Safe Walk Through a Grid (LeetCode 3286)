@@ -1,0 +1,201 @@
+# Find a Safe Walk Through a Grid (LeetCode 3286)
+
+## 📌 Problem Statement
+
+You are given:
+
+* A binary matrix `grid`, where:
+
+  * `0` represents a **safe** cell.
+  * `1` represents an **unsafe** cell.
+* An integer `health`.
+
+You start at the top-left cell `(0, 0)` and want to reach the bottom-right cell `(m-1, n-1)`.
+
+Rules:
+
+* Moving to an adjacent cell (up, down, left, or right) is allowed.
+* Entering an unsafe cell (`1`) decreases your health by `1`.
+* Entering a safe cell (`0`) does not reduce your health.
+* Your health must remain **strictly greater than 0** throughout the journey.
+
+Return `true` if there exists a valid path; otherwise, return `false`.
+
+---
+
+## 🧠 Approach
+
+### 0-1 BFS
+
+Each move has one of two possible costs:
+
+* Safe cell (`0`) → cost = `0`
+* Unsafe cell (`1`) → cost = `1`
+
+Since edge weights are only `0` or `1`, **0-1 BFS** is more efficient than Dijkstra's algorithm.
+
+A deque is used to process cells:
+
+* If moving to a safe cell, push it to the **front**.
+* If moving to an unsafe cell, push it to the **back**.
+
+This ensures that lower-cost paths are explored first.
+
+---
+
+### Tracking Remaining Health
+
+Instead of storing the minimum cost, store the **remaining health** after reaching each cell.
+
+Let:
+
+```text
+dist[i][j]
+```
+
+represent the maximum health remaining upon reaching cell `(i, j)`.
+
+Initialization:
+
+* If the starting cell is unsafe, health decreases by `1`.
+* If health becomes `0` or less immediately, return `false`.
+
+For every neighboring cell:
+
+1. Compute the movement cost.
+2. Update the remaining health.
+3. Visit the neighbor only if the remaining health is still positive.
+
+If the destination is reached, a safe path exists.
+
+---
+
+## 💻 Code (C++)
+
+```cpp
+class Solution {
+public:
+    bool findSafeWalk(vector<vector<int>>& grid, int health) {
+        int row = grid.size();
+        int col = grid[0].size();
+
+        vector<vector<int>> dist(row, vector<int>(col, -2));
+        deque<pair<int, int>> q;
+
+        q.push_back({0, 0});
+
+        if (grid[0][0] == 1) {
+            dist[0][0] = health - 1;
+            if (dist[0][0] <= 0)
+                return false;
+        } else {
+            dist[0][0] = health;
+        }
+
+        while (!q.empty()) {
+            auto [i, j] = q.front();
+            q.pop_front();
+
+            if (i == row - 1 && j == col - 1)
+                return true;
+
+            vector<pair<int, int>> dirs = {
+                {i - 1, j},
+                {i + 1, j},
+                {i, j - 1},
+                {i, j + 1}
+            };
+
+            for (auto [x, y] : dirs) {
+                if (x >= 0 && x < row &&
+                    y >= 0 && y < col &&
+                    dist[x][y] == -2) {
+
+                    int cost = (grid[x][y] == 1 ? 1 : 0);
+                    int newHealth = dist[i][j] - cost;
+
+                    if (newHealth > 0 && newHealth > dist[x][y]) {
+                        dist[x][y] = newHealth;
+
+                        if (cost == 0)
+                            q.push_front({x, y});
+                        else
+                            q.push_back({x, y});
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+};
+```
+
+---
+
+## 🚀 Example
+
+### Input
+
+```text
+grid = [[0,1,0],
+        [0,0,1],
+        [1,0,0]]
+
+health = 2
+```
+
+### One Valid Path
+
+```text
+(0,0) → (1,0) → (1,1) → (2,1) → (2,2)
+```
+
+Only one unsafe cell is visited, so health never drops to `0`.
+
+### Output
+
+```text
+true
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+Let:
+
+* `m` = number of rows
+* `n` = number of columns
+
+### Time Complexity
+
+```text
+O(m × n)
+```
+
+Each cell is processed at most once in the 0-1 BFS.
+
+### Space Complexity
+
+```text
+O(m × n)
+```
+
+For the distance matrix and deque.
+
+---
+
+## 🔑 Key Concepts
+
+* Graph Traversal
+* 0-1 BFS
+* Deque
+* Shortest Path
+* Grid Traversal
+
+---
+
+## 🏷️ Tags
+
+`Graph` `0-1 BFS` `Deque` `Grid` `Shortest Path` `Breadth-First Search` `LeetCode 3286`
