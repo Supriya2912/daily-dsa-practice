@@ -1,0 +1,282 @@
+# Find Maximum Path Score
+
+## 📌 Problem Statement
+
+You are given:
+
+* A **Directed Acyclic Graph (DAG)** represented by `edges`, where each edge is of the form:
+
+```text
+[u, v, w]
+```
+
+indicating a directed edge from node `u` to node `v` with weight `w`.
+
+* A boolean array `online`, where `online[i]` indicates whether node `i` is active.
+* An integer `k` representing the maximum allowed total path cost.
+
+Find the **maximum possible path score**, where the score of a path is defined as the **minimum edge weight** along that path.
+
+The path:
+
+* Starts from node `0`.
+* Ends at node `n-1`.
+* Cannot pass through offline intermediate nodes.
+* Must have a total edge-weight sum not exceeding `k`.
+
+Return the maximum achievable path score. If no valid path exists, return `-1`.
+
+---
+
+## 🧠 Approach
+
+### Key Observation
+
+The score of a path is determined by its **smallest edge weight**.
+
+Instead of directly maximizing this value, we perform **binary search** on the answer.
+
+For a candidate score `mid`, we ask:
+
+> **Is there a valid path whose every edge has weight at least `mid` and whose total cost is at most `k`?**
+
+If yes, we try a larger score.
+
+Otherwise, we decrease the score.
+
+---
+
+## Step 1: Build the Graph
+
+Create an adjacency list storing:
+
+* Destination node
+* Edge weight
+
+Also compute the maximum edge weight, which serves as the upper bound for binary search.
+
+---
+
+## Step 2: Topological Sort
+
+Since the graph is a **DAG**, perform a topological sort using **Kahn's Algorithm**.
+
+Processing nodes in topological order ensures that every predecessor is handled before its successors.
+
+---
+
+## Step 3: Feasibility Check
+
+For a given threshold `mid`:
+
+* Ignore every edge with:
+
+```text
+weight < mid
+```
+
+* Ignore offline intermediate nodes.
+* Compute the minimum path cost using dynamic programming over the topological order.
+
+Let:
+
+```text
+dist[u]
+```
+
+be the minimum total cost required to reach node `u`.
+
+Initially:
+
+```text
+dist[0] = 0
+```
+
+Relax outgoing edges while traversing the topological order.
+
+If:
+
+```text
+dist[n-1] ≤ k
+```
+
+then the threshold is feasible.
+
+---
+
+## Step 4: Binary Search
+
+Search over all possible edge weights:
+
+* If `mid` is feasible, search the higher half.
+* Otherwise, search the lower half.
+
+The last feasible value is the answer.
+
+---
+
+## 💻 Code (C++)
+
+```cpp
+class Solution {
+public:
+
+    bool check(long long mid,
+               vector<vector<pair<int, int>>> &adj,
+               vector<int> &topo,
+               vector<bool> &online,
+               long long k,
+               int n) {
+
+        const long long INF = 1e18;
+        vector<long long> dist(n, INF);
+        dist[0] = 0;
+
+        for (int u : topo) {
+            if (dist[u] == INF)
+                continue;
+
+            if (u != 0 && u != n - 1 && !online[u])
+                continue;
+
+            for (auto &[v, w] : adj[u]) {
+                if (w < mid)
+                    continue;
+
+                if (v != n - 1 && !online[v])
+                    continue;
+
+                dist[v] = min(dist[v], dist[u] + w);
+            }
+        }
+
+        return dist[n - 1] <= k;
+    }
+
+    int findMaxPathScore(vector<vector<int>>& edges,
+                         vector<bool>& online,
+                         long long k) {
+
+        int n = online.size();
+
+        vector<vector<pair<int, int>>> adj(n);
+        vector<int> indegree(n);
+
+        int mx = 0;
+
+        for (auto &e : edges) {
+            int u = e[0];
+            int v = e[1];
+            int w = e[2];
+
+            adj[u].push_back({v, w});
+            indegree[v]++;
+
+            mx = max(mx, w);
+        }
+
+        queue<int> q;
+
+        for (int i = 0; i < n; i++)
+            if (indegree[i] == 0)
+                q.push(i);
+
+        vector<int> topo;
+
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+
+            topo.push_back(u);
+
+            for (auto &[v, w] : adj[u]) {
+                if (--indegree[v] == 0)
+                    q.push(v);
+            }
+        }
+
+        long long low = 0;
+        long long high = mx;
+
+        int ans = -1;
+
+        while (low <= high) {
+            long long mid = (low + high) / 2;
+
+            if (check(mid, adj, topo, online, k, n)) {
+                ans = mid;
+                low = mid + 1;
+            }
+            else {
+                high = mid - 1;
+            }
+        }
+
+        return ans;
+    }
+};
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+Let:
+
+* `V` = number of nodes
+* `E` = number of edges
+* `W` = maximum edge weight
+
+### Topological Sort
+
+```text
+O(V + E)
+```
+
+### Feasibility Check
+
+Each check processes every node and edge once.
+
+```text
+O(V + E)
+```
+
+### Binary Search
+
+Binary search performs:
+
+```text
+O(log W)
+```
+
+checks.
+
+### Overall Time Complexity
+
+```text
+O((V + E) × log W)
+```
+
+### Space Complexity
+
+```text
+O(V + E)
+```
+
+for the adjacency list, topological order, and distance array.
+
+---
+
+## 🔑 Key Concepts
+
+* Directed Acyclic Graph (DAG)
+* Topological Sorting (Kahn's Algorithm)
+* Dynamic Programming on DAG
+* Binary Search on Answer
+* Shortest Path in DAG
+
+---
+
+## 🏷️ Tags
+
+`Graph` `DAG` `Topological Sort` `Binary Search` `Dynamic Programming` `Shortest Path`
