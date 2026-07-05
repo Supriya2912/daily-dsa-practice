@@ -1,0 +1,235 @@
+# Number of Paths with Maximum Score (LeetCode 1301)
+
+## 📌 Problem Statement
+
+You are given an `n × n` board where each cell contains:
+
+* `'S'` – Starting position (bottom-right)
+* `'E'` – Ending position (top-left)
+* `'X'` – Obstacle (cannot be visited)
+* `'1'` to `'9'` – A cell containing points
+
+You can move only:
+
+* Up
+* Left
+* Diagonally up-left
+
+Your task is to find:
+
+1. The **maximum score** obtainable while moving from `S` to `E`.
+2. The **number of different paths** that achieve this maximum score.
+
+Return:
+
+```text
+[maxScore, numberOfPaths]
+```
+
+The number of paths should be returned modulo:
+
+```text
+1,000,000,007
+```
+
+If no valid path exists, return:
+
+```text
+[0, 0]
+```
+
+---
+
+## 🧠 Approach
+
+### Dynamic Programming
+
+Since movement is restricted to **up**, **left**, and **diagonal up-left**, we process the board **from bottom-right (`S`) to top-left (`E`)**.
+
+Maintain two DP tables:
+
+* `dp[i][j]` → Maximum score that can be obtained when reaching cell `(i, j)`.
+* `path[i][j]` → Number of ways to achieve `dp[i][j]`.
+
+Initially:
+
+* Start from `S` with score `0`.
+* There is exactly one way to stand at the starting cell.
+
+---
+
+### State Transition
+
+For every cell `(i, j)`, consider the three possible moves:
+
+* Up
+* Left
+* Diagonal up-left
+
+If the next cell is not an obstacle:
+
+1. Compute the new score by adding the value of the destination cell (except `'E'`, which contributes `0`).
+2. Compare it with the current best score stored in `dp`.
+
+There are two cases:
+
+#### Better Score Found
+
+Replace:
+
+* Maximum score
+* Number of paths
+
+```text
+dp[next] = newScore
+path[next] = path[current]
+```
+
+#### Same Maximum Score
+
+Another optimal path has been found.
+
+Add the number of paths:
+
+```text
+path[next] += path[current]
+```
+
+using modulo arithmetic.
+
+---
+
+## 💻 Code (C++)
+
+```cpp
+class Solution {
+public:
+    int mod = 1e9 + 7;
+
+    vector<int> pathsWithMaxScore(vector<string>& mat) {
+        int n = mat.size();
+        int m = mat[0].size();
+
+        vector<vector<int>> dp(n, vector<int>(m, 0));
+        vector<vector<int>> path(n, vector<int>(m, 0));
+
+        path[n - 1][m - 1] = 1;
+        dp[n - 1][m - 1] = 0;
+
+        vector<pair<int, int>> dir = {
+            {-1, 0},
+            {0, -1},
+            {-1, -1}
+        };
+
+        for (int i = n - 1; i >= 0; i--) {
+            for (int j = m - 1; j >= 0; j--) {
+
+                for (auto it : dir) {
+                    int nx = i + it.first;
+                    int ny = j + it.second;
+
+                    int val = dp[i][j];
+
+                    if (nx >= 0 && nx < n &&
+                        ny >= 0 && ny < m &&
+                        mat[nx][ny] != 'X') {
+
+                        val += (mat[nx][ny] != 'E')
+                               ? mat[nx][ny] - '0'
+                               : 0;
+
+                        if (val > dp[nx][ny]) {
+                            dp[nx][ny] = val;
+                            path[nx][ny] = path[i][j];
+                        }
+                        else if (val == dp[nx][ny]) {
+                            path[nx][ny] =
+                                (path[nx][ny] + path[i][j]) % mod;
+                        }
+                    }
+                }
+            }
+        }
+
+        return {path[0][0] == 0 ? 0 : dp[0][0], path[0][0]};
+    }
+};
+```
+
+---
+
+## 🚀 Example
+
+### Input
+
+```text
+board =
+[
+"E23",
+"2X2",
+"12S"
+]
+```
+
+### Best Path
+
+```text
+S → 2 → 3 → E
+```
+
+Collected score:
+
+```text
+7
+```
+
+Number of optimal paths:
+
+```text
+1
+```
+
+### Output
+
+```text
+[7,1]
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+Let `n` be the size of the board.
+
+### Time Complexity
+
+Each cell considers at most **3** previous positions.
+
+```text
+O(n²)
+```
+
+### Space Complexity
+
+Two DP tables of size `n × n` are maintained.
+
+```text
+O(n²)
+```
+
+---
+
+## 🔑 Key Concepts
+
+* Dynamic Programming
+* Grid DP
+* Path Counting
+* Maximum Path Sum
+* Modular Arithmetic
+
+---
+
+## 🏷️ Tags
+
+`Dynamic Programming` `Grid` `Matrix` `Path Counting` `LeetCode 1301`
