@@ -1,0 +1,173 @@
+# Remove Covered Intervals (LeetCode 1288)
+
+## 📌 Problem Statement
+
+You are given a list of intervals where:
+
+```text id="9rglh6"
+intervals[i] = [starti, endi]
+```
+
+An interval is **covered** by another interval if:
+
+```text id="xqzpq7"
+startj ≤ starti
+and
+endi ≤ endj
+```
+
+In other words, the entire interval lies within another interval.
+
+Return the number of intervals remaining after removing all covered intervals.
+
+---
+
+## 🧠 Approach
+
+### Sorting + Greedy
+
+The key idea is to sort the intervals so that covered intervals can be detected in a single pass.
+
+### Sorting Order
+
+Sort intervals by:
+
+1. **Starting point in ascending order**
+2. **Ending point in descending order** when the starting points are equal
+
+```text id="bkrcx4"
+(start ↑, end ↓)
+```
+
+This ordering ensures that for intervals with the same start, the longer interval appears first, making shorter intervals easy to identify as covered.
+
+---
+
+### Greedy Traversal
+
+Maintain:
+
+```text id="mqyfr5"
+maxEnd
+```
+
+which stores the largest ending point seen so far.
+
+For each interval:
+
+* If its ending point is greater than `maxEnd`, it is **not covered**.
+
+  * Count it.
+  * Update `maxEnd`.
+* Otherwise, its ending point is less than or equal to `maxEnd`, meaning it is completely covered by a previously processed interval.
+
+---
+
+### Why It Works
+
+After sorting:
+
+* Every previously processed interval starts no later than the current one.
+* If the current interval also ends no later than `maxEnd`, then it is fully contained within an earlier interval.
+
+Thus, every covered interval is skipped, and every uncovered interval is counted exactly once.
+
+---
+
+## 💻 Code (C++)
+
+```cpp id="wym3jg"
+class Solution {
+public:
+    int removeCoveredIntervals(vector<vector<int>>& intervals) {
+        sort(intervals.begin(), intervals.end(),
+            [](vector<int>& a, vector<int>& b) {
+                if (a[0] == b[0])
+                    return a[1] > b[1];
+                return a[0] < b[0];
+            });
+
+        int count = 0;
+        int maxEnd = 0;
+
+        for (auto &interval : intervals) {
+            if (interval[1] > maxEnd) {
+                count++;
+                maxEnd = interval[1];
+            }
+        }
+
+        return count;
+    }
+};
+```
+
+---
+
+## 🚀 Example
+
+### Input
+
+```text id="g5m8ys"
+intervals = [[1,4],[3,6],[2,8]]
+```
+
+### After Sorting
+
+```text id="jlwm1g"
+[[1,4],[2,8],[3,6]]
+```
+
+Traversal:
+
+| Interval | maxEnd | Covered? |
+| -------- | ------ | -------- |
+| [1,4]    | 4      | No       |
+| [2,8]    | 8      | No       |
+| [3,6]    | 8      | Yes      |
+
+Remaining intervals:
+
+```text id="35d8m4"
+2
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+Let `n` be the number of intervals.
+
+### Time Complexity
+
+* Sorting: **O(n log n)**
+* Single traversal: **O(n)**
+
+Overall:
+
+```text id="fw66pr"
+O(n log n)
+```
+
+### Space Complexity
+
+```text id="3kmthx"
+O(1)
+```
+
+Ignoring the space used internally by the sorting algorithm.
+
+---
+
+## 🔑 Key Concepts
+
+* Greedy Algorithm
+* Sorting
+* Interval Processing
+* Single Pass Traversal
+
+---
+
+## 🏷️ Tags
+
+`Greedy` `Sorting` `Intervals` `Array` `LeetCode 1288`
