@@ -1,0 +1,200 @@
+# Path Existence Queries in an Array
+
+## 📌 Problem Statement
+
+You are given:
+
+* An integer `n`.
+* A sorted array `nums`.
+* An integer `maxDiff`.
+* A list of queries, where each query is:
+
+```text
+[start, end]
+```
+
+Two adjacent elements are considered connected if:
+
+```text
+nums[i] - nums[i - 1] ≤ maxDiff
+```
+
+For each query, determine whether there exists a continuous path from index `start` to index `end` by moving through adjacent connected elements.
+
+Return a boolean array where each element corresponds to the answer for a query.
+
+---
+
+## 🧠 Approach
+
+### Connected Components Using Prefix Labels
+
+Since the array is sorted, connectivity depends only on the difference between consecutive elements.
+
+If:
+
+```text
+nums[i] - nums[i - 1] > maxDiff
+```
+
+then the connection breaks, and a **new connected component** begins.
+
+Instead of processing each query independently, preprocess the array by assigning every index a component number.
+
+---
+
+### Preprocessing
+
+Create an array:
+
+```text
+cmp[i]
+```
+
+where `cmp[i]` stores the component ID of index `i`.
+
+Initialize:
+
+```text
+cmp[0] = 0
+```
+
+For every index:
+
+* If the gap with the previous element is greater than `maxDiff`, increment the component ID.
+* Otherwise, remain in the same component.
+
+This can be computed in a single pass.
+
+---
+
+### Answering Queries
+
+For a query:
+
+```text
+[l, r]
+```
+
+A path exists if both indices belong to the same connected component:
+
+```text
+cmp[l] == cmp[r]
+```
+
+Each query is answered in constant time.
+
+---
+
+## 💻 Code (C++)
+
+```cpp
+class Solution {
+public:
+    vector<bool> pathExistenceQueries(int n, vector<int>& nums, int maxDiff,
+                                      vector<vector<int>>& queries) {
+        vector<int> cmp(n);
+
+        for (int i = 1; i < n; i++) {
+            cmp[i] = cmp[i - 1] + (nums[i] - nums[i - 1] > maxDiff);
+        }
+
+        vector<bool> res;
+
+        for (const auto &q : queries) {
+            res.push_back(cmp[q[0]] == cmp[q[1]]);
+        }
+
+        return res;
+    }
+};
+```
+
+---
+
+## 🚀 Example
+
+### Input
+
+```text
+nums = [1, 3, 5, 10, 11]
+maxDiff = 2
+
+queries = [[0,2], [1,3], [3,4]]
+```
+
+### Component Assignment
+
+Differences:
+
+```text
+3-1 = 2   ✓
+5-3 = 2   ✓
+10-5 = 5  ✗
+11-10 = 1 ✓
+```
+
+Components:
+
+```text
+Index : 0 1 2 3 4
+cmp   : 0 0 0 1 1
+```
+
+Queries:
+
+| Query | Same Component | Answer  |
+| ----- | -------------- | ------- |
+| [0,2] | Yes            | `true`  |
+| [1,3] | No             | `false` |
+| [3,4] | Yes            | `true`  |
+
+### Output
+
+```text
+[true, false, true]
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+Let:
+
+* `n` = number of elements
+* `q` = number of queries
+
+### Time Complexity
+
+* Preprocessing components: **O(n)**
+* Answering queries: **O(q)**
+
+Overall:
+
+```text
+O(n + q)
+```
+
+### Space Complexity
+
+```text
+O(n)
+```
+
+for the component array.
+
+---
+
+## 🔑 Key Concepts
+
+* Prefix Processing
+* Connected Components
+* Greedy Observation
+* Constant-Time Query Answering
+* Array Traversal
+
+---
+
+## 🏷️ Tags
+
+`Array` `Prefix Sum` `Connected Components` `Greedy` `Queries`
