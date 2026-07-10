@@ -1,0 +1,313 @@
+# Path Existence Queries with Minimum Jumps
+
+## 📌 Problem Statement
+
+You are given:
+
+* An integer `n`.
+* An array `nums`.
+* An integer `maxDiff`.
+* A list of queries, where each query is:
+
+```text
+[start, end]
+```
+
+You may move between elements whose values differ by at most `maxDiff`.
+
+For each query, determine the **minimum number of jumps** required to move from index `start` to index `end`.
+
+If it is impossible to reach the destination, return `-1`.
+
+If both indices are the same, return `0`.
+
+---
+
+## 🧠 Approach
+
+### Step 1: Sort the Elements
+
+The indices in the original array are not useful for determining reachability based on values.
+
+Create pairs:
+
+```text
+(value, originalIndex)
+```
+
+and sort them by value.
+
+Also maintain a mapping:
+
+```text
+originalIndex → sortedPosition
+```
+
+so every query can be converted into the sorted order.
+
+---
+
+### Step 2: Compute the Farthest Reach
+
+Using the two-pointer technique, compute:
+
+```text
+up[i]
+```
+
+where `up[i]` is the farthest sorted position reachable from position `i` using one jump.
+
+Maintain a sliding window:
+
+* Increase the right pointer while
+
+```text
+sortedNums[right] - sortedNums[left] ≤ maxDiff
+```
+
+This preprocessing runs in linear time.
+
+---
+
+### Step 3: Binary Lifting
+
+Jumping one step repeatedly would be too slow.
+
+Build a binary lifting table:
+
+```text
+dp[i][j]
+```
+
+where
+
+```text
+dp[i][j]
+```
+
+represents the position reached after:
+
+```text
+2^j
+```
+
+jumps starting from position `i`.
+
+Transition:
+
+```text
+dp[i][j] = dp[ dp[i][j-1] ][j-1]
+```
+
+This allows jumping exponentially fast.
+
+---
+
+### Step 4: Process Queries
+
+For each query:
+
+1. Convert original indices into sorted positions.
+2. Let:
+
+```text
+st = smaller position
+en = larger position
+```
+
+3. Starting from `st`, use binary lifting to make the largest possible jumps without passing `en`.
+4. If the destination becomes reachable with one more jump, return the total number of jumps.
+5. Otherwise, return `-1`.
+
+If both indices are identical, the answer is `0`.
+
+---
+
+## 💻 Code (C++)
+
+```cpp
+class Solution {
+public:
+    vector<int> pathExistenceQueries(int n, vector<int>& nums,
+                                     int maxDiff,
+                                     vector<vector<int>>& queries) {
+
+        vector<pair<int,int>> sortedNums;
+
+        for (int i = 0; i < n; i++)
+            sortedNums.push_back({nums[i], i});
+
+        sort(sortedNums.begin(), sortedNums.end());
+
+        unordered_map<int,int> point;
+
+        for (int i = 0; i < n; i++)
+            point[sortedNums[i].second] = i;
+
+        vector<int> up(n);
+
+        int j = 0;
+
+        for (int i = 0; i < n; i++) {
+            while (j + 1 < n &&
+                   sortedNums[j + 1].first - sortedNums[i].first <= maxDiff)
+                j++;
+
+            if (j < i)
+                j = i;
+
+            up[i] = j;
+        }
+
+        int LOG = 0;
+        int temp = n;
+
+        while (temp) {
+            LOG++;
+            temp >>= 1;
+        }
+
+        vector<vector<int>> dp(n, vector<int>(LOG));
+
+        for (int i = 0; i < n; i++)
+            dp[i][0] = up[i];
+
+        for (int j = 1; j < LOG; j++) {
+            for (int i = 0; i < n; i++) {
+                dp[i][j] = dp[dp[i][j - 1]][j - 1];
+            }
+        }
+
+        vector<int> res;
+
+        for (auto &q : queries) {
+
+            int u = q[0];
+            int v = q[1];
+
+            if (u == v) {
+                res.push_back(0);
+                continue;
+            }
+
+            int st = min(point[u], point[v]);
+            int en = max(point[u], point[v]);
+
+            if (up[st] == st) {
+                res.push_back(-1);
+                continue;
+            }
+
+            int node = st;
+            int step = 0;
+
+            for (int i = LOG - 1; i >= 0; i--) {
+                if (dp[node][i] < en) {
+                    node = dp[node][i];
+                    step += (1 << i);
+                }
+            }
+
+            if (up[node] < en)
+                res.push_back(-1);
+            else
+                res.push_back(step + 1);
+        }
+
+        return res;
+    }
+};
+```
+
+---
+
+## 🚀 Example
+
+### Input
+
+```text
+nums = [1, 3, 5, 8]
+maxDiff = 2
+
+queries = [[0,2],[0,3]]
+```
+
+### Sorted Values
+
+```text
+[1,3,5,8]
+```
+
+Reachability:
+
+```text
+1 → 3 → 5
+```
+
+but
+
+```text
+5 → 8
+```
+
+is not possible because:
+
+```text
+8 - 5 > 2
+```
+
+### Output
+
+```text
+[2, -1]
+```
+
+* Query `[0,2]` requires two jumps.
+* Query `[0,3]` is impossible.
+
+---
+
+## ⏱️ Complexity Analysis
+
+Let:
+
+* `n` = number of elements
+* `q` = number of queries
+
+### Time Complexity
+
+* Sorting: **O(n log n)**
+* Two-pointer preprocessing: **O(n)**
+* Binary lifting table: **O(n log n)**
+* Query processing: **O(q log n)**
+
+Overall:
+
+```text
+O((n + q) log n)
+```
+
+### Space Complexity
+
+```text
+O(n log n)
+```
+
+for the binary lifting table.
+
+---
+
+## 🔑 Key Concepts
+
+* Sorting
+* Two Pointers
+* Binary Lifting
+* Greedy Reachability
+* Jump Pointers
+* Query Processing
+
+---
+
+## 🏷️ Tags
+
+`Binary Lifting` `Two Pointers` `Sorting` `Greedy` `Dynamic Programming` `Queries`
