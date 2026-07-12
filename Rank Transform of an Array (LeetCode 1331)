@@ -1,0 +1,170 @@
+# Rank Transform of an Array (LeetCode 1331)
+
+## 📌 Problem Statement
+
+Given an integer array `arr`, replace each element with its **rank**.
+
+The rank is assigned according to the following rules:
+
+* Rank starts from `1`.
+* The larger the value, the larger its rank.
+* Equal values receive the same rank.
+* Ranks should be as small as possible.
+
+Return the transformed array.
+
+---
+
+## 🧠 Approach
+
+### Sorting + Hash Map
+
+The relative ordering of the elements determines their ranks.
+
+1. Create a copy of the original array.
+2. Sort the copied array.
+3. Traverse the sorted array and assign ranks to each **unique** value.
+4. Store the mapping:
+
+```text id="ks64qx"
+value → rank
+```
+
+using a hash map.
+
+Finally, traverse the original array and replace every element with its corresponding rank.
+
+---
+
+### Why It Works
+
+After sorting:
+
+* Smaller values appear before larger values.
+* The first unique value gets rank `1`.
+* Every new unique value receives the next available rank.
+* Duplicate values reuse the previously assigned rank.
+
+Since the original array is never modified during ranking, we can reconstruct the transformed array by looking up each element's rank.
+
+---
+
+## 💻 Code (C++)
+
+```cpp id="pjhfx0"
+class Solution {
+public:
+    vector<int> arrayRankTransform(vector<int>& arr) {
+        vector<int> temp = arr;
+
+        sort(temp.begin(), temp.end());
+
+        unordered_map<int, int> rank;
+        int r = 1;
+
+        for (int x : temp) {
+            if (!rank.count(x)) {
+                rank[x] = r++;
+            }
+        }
+
+        vector<int> ans;
+
+        for (int x : arr) {
+            ans.push_back(rank[x]);
+        }
+
+        return ans;
+    }
+};
+```
+
+---
+
+## 🚀 Example
+
+### Example 1
+
+**Input**
+
+```text id="e1r69j"
+arr = [40,10,20,30]
+```
+
+Sorted unique values:
+
+```text id="stjnx9"
+10 → 1
+20 → 2
+30 → 3
+40 → 4
+```
+
+Output:
+
+```text id="lgz1sz"
+[4,1,2,3]
+```
+
+---
+
+### Example 2
+
+**Input**
+
+```text id="smdbjv"
+arr = [100,100,100]
+```
+
+All values are identical, so they receive the same rank.
+
+Output:
+
+```text id="7vfk4m"
+[1,1,1]
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+Let `n` be the size of the array.
+
+### Time Complexity
+
+* Copy array: **O(n)**
+* Sort the copied array: **O(n log n)**
+* Assign ranks: **O(n)**
+* Build the answer: **O(n)**
+
+Overall:
+
+```text id="2lq38j"
+O(n log n)
+```
+
+### Space Complexity
+
+* Copy of the array: **O(n)**
+* Hash map for ranks: **O(n)**
+
+Overall:
+
+```text id="53a87p"
+O(n)
+```
+
+---
+
+## 🔑 Key Concepts
+
+* Sorting
+* Hash Map
+* Coordinate Compression
+* Array Transformation
+
+---
+
+## 🏷️ Tags
+
+`Array` `Sorting` `Hash Map` `Coordinate Compression` `LeetCode 1331`
