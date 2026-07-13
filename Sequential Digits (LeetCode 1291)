@@ -1,0 +1,181 @@
+# Sequential Digits (LeetCode 1291)
+
+## 📌 Problem Statement
+
+A **sequential digit** number is an integer where every digit is exactly one greater than the previous digit.
+
+Examples:
+
+```text id="l6d63t"
+123
+2345
+6789
+```
+
+Given two integers `low` and `high`, return all sequential digit numbers in the inclusive range:
+
+```text id="eg3pmv"
+[low, high]
+```
+
+The returned numbers should be sorted in increasing order.
+
+---
+
+## 🧠 Approach
+
+### Generate from `"123456789"`
+
+Every sequential digit number is a substring of:
+
+```text id="17v9kx"
+"123456789"
+```
+
+For example:
+
+```text id="31cnan"
+Length 2 → 12, 23, 34, 45, 56, 67, 78, 89
+Length 3 → 123, 234, 345, 456, 567, 678, 789
+Length 4 → 1234, 2345, ...
+```
+
+Therefore:
+
+1. Determine the number of digits in `low` and `high`.
+2. Generate every substring of `"123456789"` having lengths within this range.
+3. Convert each substring to an integer.
+4. Keep only those numbers lying between `low` and `high`.
+
+Since the substrings are generated in increasing order, the resulting list is already sorted.
+
+---
+
+## 💻 Code (C++)
+
+```cpp id="gjk4x0"
+class Solution {
+public:
+    vector<int> sequentialDigits(int low, int high) {
+        vector<int> ans;
+
+        string s = "123456789";
+        string l = to_string(low);
+        string h = to_string(high);
+
+        for (int len = l.size(); len <= h.size(); len++) {
+            for (int start = 0; start <= 9 - len; start++) {
+                string numStr = s.substr(start, len);
+                int num = stoi(numStr);
+
+                if (num >= low && num <= high)
+                    ans.push_back(num);
+            }
+        }
+
+        return ans;
+    }
+};
+```
+
+---
+
+## 🚀 Example
+
+### Example 1
+
+**Input**
+
+```text id="5jmrq4"
+low = 100
+high = 300
+```
+
+Generated sequential numbers:
+
+```text id="t3dl7m"
+123
+234
+345
+456
+...
+```
+
+Numbers within the range:
+
+```text id="87u31h"
+123
+234
+```
+
+**Output**
+
+```text id="aq6fmq"
+[123,234]
+```
+
+---
+
+### Example 2
+
+**Input**
+
+```text id="jlwm2k"
+low = 1000
+high = 13000
+```
+
+**Output**
+
+```text id="ws6ht4"
+[1234,2345,3456,4567,5678,6789,12345]
+```
+
+---
+
+## ⏱️ Complexity Analysis
+
+Let `d` be the maximum number of digits (at most **9**).
+
+### Time Complexity
+
+There are only a fixed number of possible sequential digit numbers.
+
+The algorithm generates at most:
+
+```text id="5e1u5u"
+8 + 7 + 6 + ... + 1 = 36
+```
+
+substrings.
+
+Thus,
+
+```text id="bqsdif"
+O(1)
+```
+
+(Or equivalently **O(36)**.)
+
+### Space Complexity
+
+Ignoring the output array:
+
+```text id="j2t9fr"
+O(1)
+```
+
+---
+
+## 🔑 Key Concepts
+
+* String Manipulation
+* Substring Generation
+* Simulation
+* Enumeration
+
+---
+
+## 🏷️ Tags
+
+`String` `Simulation` `Enumeration` `Math` `LeetCode 1291`
