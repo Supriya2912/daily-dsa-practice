@@ -1,0 +1,86 @@
+# Find Greatest Common Divisor of Array
+
+## Problem Statement
+
+Given an integer array `nums`, return the **greatest common divisor (GCD)** of the smallest and largest numbers in the array.
+
+The **greatest common divisor** of two numbers is the largest positive integer that divides both numbers without leaving a remainder.
+
+### Example
+
+**Input**
+```
+nums = [2, 5, 6, 9, 10]
+```
+
+**Output**
+```
+2
+```
+
+**Explanation**
+
+- Smallest element = 2
+- Largest element = 10
+- GCD(2, 10) = 2
+
+---
+
+## Approach
+
+The GCD only depends on the smallest and largest elements of the array.
+
+1. Traverse the array once to find:
+   - Minimum element
+   - Maximum element
+2. Use the **Euclidean Algorithm** to compute the GCD of these two values.
+3. Return the computed GCD.
+
+The Euclidean Algorithm repeatedly replaces the larger number with the remainder until the remainder becomes zero. The last non-zero value is the GCD.
+
+---
+
+## Algorithm
+
+1. Initialize `mn` and `mx` with the first element.
+2. Traverse the array:
+   - Update the minimum value.
+   - Update the maximum value.
+3. Compute `gcd(mx, mn)` using the Euclidean Algorithm.
+4. Return the result.
+
+---
+
+## Complexity Analysis
+
+- **Time Complexity:** `O(n + log(min(mx, mn)))`
+  - `O(n)` to find the minimum and maximum elements.
+  - `O(log(min(mx, mn)))` for the Euclidean Algorithm.
+- **Space Complexity:** `O(1)`
+
+---
+
+## C++ Solution
+
+```cpp
+class Solution {
+public:
+    int gcd(int a, int b) {
+        if (b == 0) {
+            return a;
+        }
+        return gcd(b, a % b);
+    }
+
+    int findGCD(vector<int>& nums) {
+        int mn = nums[0], mx = nums[0];
+
+        for (const auto &x : nums) {
+            mn = min(mn, x);
+            mx = max(mx, x);
+        }
+
+        return gcd(mx, mn);
+    }
+};
+```
