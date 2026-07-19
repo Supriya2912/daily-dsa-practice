@@ -1,0 +1,113 @@
+# Smallest Subsequence of Distinct Characters
+
+## Problem Statement
+
+Given a string `s`, return the **lexicographically smallest subsequence** that contains every distinct character of `s` exactly once.
+
+A subsequence is formed by deleting zero or more characters without changing the order of the remaining characters.
+
+### Example
+
+**Input**
+```
+s = "bcabc"
+```
+
+**Output**
+```
+"abc"
+```
+
+**Explanation**
+
+The subsequence `"abc"` contains all distinct characters exactly once and is the lexicographically smallest possible.
+
+---
+
+## Approach
+
+Use a **greedy algorithm** with a stack.
+
+### Key Observations
+
+- Each character should appear only once in the answer.
+- If the current character is smaller than the stack's top and the top character appears again later, removing it leads to a smaller lexicographical result.
+- Maintain:
+  - `freq` to store the remaining occurrences of each character.
+  - `inStack` to track whether a character is already included in the stack.
+
+### Steps
+
+1. Count the frequency of each character.
+2. Traverse the string:
+   - Decrease the current character's remaining frequency.
+   - Skip it if it is already in the stack.
+   - While:
+     - the stack is not empty,
+     - the top character is greater than the current character,
+     - and the top character appears again later,
+     remove the top character from the stack.
+   - Push the current character onto the stack.
+3. Return the stack as the answer.
+
+This greedy strategy guarantees the lexicographically smallest valid subsequence.
+
+---
+
+## Algorithm
+
+1. Count the frequency of every character.
+2. Initialize an empty stack (implemented as a string).
+3. For each character:
+   - Decrease its frequency.
+   - Skip if already present in the stack.
+   - Remove larger characters from the top of the stack if they occur again later.
+   - Push the current character.
+4. Return the stack.
+
+---
+
+## Complexity Analysis
+
+- **Time Complexity:** `O(n)`
+  - Each character is pushed and popped at most once.
+- **Space Complexity:** `O(1)`
+  - Uses fixed-size arrays of size 26 and a stack.
+
+---
+
+## C++ Solution
+
+```cpp
+class Solution {
+public:
+    string smallestSubsequence(string s) {
+        vector<int> freq(26, 0);
+        vector<bool> inStack(26, false);
+
+        for (char c : s)
+            freq[c - 'a']++;
+
+        string st;
+
+        for (char c : s) {
+            freq[c - 'a']--;
+
+            if (inStack[c - 'a'])
+                continue;
+
+            while (!st.empty() &&
+                   st.back() > c &&
+                   freq[st.back() - 'a'] > 0) {
+                inStack[st.back() - 'a'] = false;
+                st.pop_back();
+            }
+
+            st.push_back(c);
+            inStack[c - 'a'] = true;
+        }
+
+        return st;
+    }
+};
+```
