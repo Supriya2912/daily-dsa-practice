@@ -1,0 +1,106 @@
+# Shift 2D Grid
+
+## Problem Statement
+
+You are given an `m x n` grid and an integer `k`.
+
+In one shift operation:
+
+- Each element moves to the next column.
+- The last element of a row moves to the first column of the next row.
+- The last element of the grid moves to the first position.
+
+Return the grid after applying the shift operation `k` times.
+
+### Example
+
+**Input**
+```
+grid = [[1,2,3],
+        [4,5,6],
+        [7,8,9]]
+k = 1
+```
+
+**Output**
+```
+[[9,1,2],
+ [3,4,5],
+ [6,7,8]]
+```
+
+---
+
+## Approach
+
+Instead of performing the shift operation `k` times, treat the 2D grid as a single linear array.
+
+### Key Idea
+
+- Each cell `(i, j)` has a linear index:
+  ```
+  index = i * n + j
+  ```
+- After shifting by `k` positions:
+  ```
+  newIndex = (index + k) % (m * n)
+  ```
+- Convert the new linear index back to 2D coordinates:
+  ```
+  newRow = newIndex / n
+  newCol = newIndex % n
+  ```
+
+Place each element directly into its final position.
+
+This avoids repeated shifting and completes the task in one traversal.
+
+---
+
+## Algorithm
+
+1. Compute the total number of elements: `m * n`.
+2. Create an empty result grid of the same dimensions.
+3. Traverse every cell in the original grid.
+4. Convert its position to a linear index.
+5. Compute the shifted index using modulo.
+6. Convert the shifted index back to row and column.
+7. Place the element in its new position.
+8. Return the resulting grid.
+
+---
+
+## Complexity Analysis
+
+- **Time Complexity:** `O(m × n)`
+- **Space Complexity:** `O(m × n)`
+
+---
+
+## C++ Solution
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> shiftGrid(vector<vector<int>>& grid, int k) {
+        int m = grid.size(), n = grid[0].size();
+        int total = m * n;
+
+        vector<vector<int>> ans(m, vector<int>(n, 0));
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                int cur = i * n + j;
+                cur = (cur + k) % total;
+
+                int newI = cur / n;
+                int newJ = cur % n;
+
+                ans[newI][newJ] = grid[i][j];
+            }
+        }
+
+        return ans;
+    }
+};
+```
