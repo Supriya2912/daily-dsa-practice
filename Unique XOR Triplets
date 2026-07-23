@@ -1,0 +1,108 @@
+# Unique XOR Triplets
+
+## Problem Statement
+
+You are given an integer array `nums`.
+
+A **triplet** is a sequence of three elements chosen from the array, where elements can be selected according to the problem's allowed indexing rules.
+
+For every possible triplet, calculate its bitwise XOR value.
+
+Return the number of **distinct XOR values** that can be obtained.
+
+### Example
+
+**Input**
+```
+nums = [1, 2, 3]
+```
+
+**Output**
+```
+4
+```
+
+The possible XOR values cover the range of values from `0` to `3`, resulting in `4` unique values.
+
+---
+
+## Approach
+
+The solution uses a bitwise observation.
+
+### Case 1: `n <= 2`
+
+If the array contains at most two elements, the number of distinct XOR triplet values is directly related to the number of available elements.
+
+Therefore, return:
+
+```cpp
+n
+```
+
+### Case 2: `n > 2`
+
+For larger arrays, calculate the bitwise OR of all elements:
+
+```cpp
+mask |= num;
+```
+
+The OR operation identifies all bit positions that can potentially contribute to the XOR results.
+
+The number of possible distinct XOR values is then:
+
+```cpp
+mask + 1
+```
+
+This works because the reachable XOR values form the complete range of values represented by the available bit positions.
+
+---
+
+## Algorithm
+
+1. Get the size of the array.
+2. If `n <= 2`, return `n`.
+3. Initialize `mask = 0`.
+4. Compute the bitwise OR of all elements:
+   ```
+   mask = nums[0] | nums[1] | ... | nums[n-1]
+   ```
+5. Return:
+   ```
+   mask + 1
+   ```
+
+---
+
+## Complexity Analysis
+
+Let `n` be the number of elements in `nums`.
+
+- **Time Complexity:** `O(n)`
+- **Space Complexity:** `O(1)`
+
+---
+
+## C++ Solution
+
+```cpp
+class Solution {
+public:
+    int uniqueXorTriplets(vector<int>& nums) {
+        int n = nums.size();
+
+        if (n <= 2)
+            return n;
+
+        int mask = 0;
+
+        for (int num : nums) {
+            mask |= num;
+        }
+
+        return mask + 1;
+    }
+};
+```
