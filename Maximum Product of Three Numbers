@@ -1,0 +1,145 @@
+# Maximum Product of Three Numbers
+
+## Problem Statement
+
+Given an integer array `nums`, find three numbers whose product is the maximum and return the maximum product.
+
+The array can contain both positive and negative integers.
+
+### Example
+
+**Input**
+```text
+nums = [-10, -10, 5, 2]
+```
+
+**Output**
+```text
+500
+```
+
+**Explanation**
+
+The maximum product is:
+
+```text
+(-10) × (-10) × 5 = 500
+```
+
+---
+
+## Approach
+
+The maximum product of three numbers can come from two possible cases:
+
+### Case 1: Three Largest Numbers
+
+The product of the three largest numbers:
+
+```text
+max1 × max2 × max3
+```
+
+This is the best option when the largest values are positive.
+
+### Case 2: Two Smallest Numbers and the Largest Number
+
+Two negative numbers produce a positive value when multiplied together. Therefore, the product of the two smallest numbers and the largest number can be maximum:
+
+```text
+min1 × min2 × max1
+```
+
+For example:
+
+```text
+(-10) × (-10) × 5 = 500
+```
+
+We calculate both products and return the larger one.
+
+Instead of sorting the array, we maintain:
+
+- Three largest values: `max1`, `max2`, `max3`
+- Two smallest values: `min1`, `min2`
+
+This allows us to solve the problem in a single pass.
+
+---
+
+## Algorithm
+
+1. Initialize:
+   - `max1`, `max2`, `max3` as the three largest values.
+   - `min1`, `min2` as the two smallest values.
+2. Traverse the array once.
+3. Update the three maximum values.
+4. Update the two minimum values.
+5. Calculate:
+   ```text
+   product1 = max1 × max2 × max3
+   product2 = min1 × min2 × max1
+   ```
+6. Return the maximum of the two products.
+
+---
+
+## Complexity Analysis
+
+- **Time Complexity:** `O(n)`
+  - The array is traversed only once.
+
+- **Space Complexity:** `O(1)`
+  - Only a fixed number of variables are used.
+
+---
+
+## C++ Solution
+
+```cpp
+class Solution {
+public:
+    int maximumProduct(vector<int>& nums) {
+        int max1 = INT_MIN;
+        int max2 = INT_MIN;
+        int max3 = INT_MIN;
+
+        int min1 = INT_MAX;
+        int min2 = INT_MAX;
+
+        for (int num : nums) {
+
+            // Find three largest numbers
+            if (num >= max1) {
+                max3 = max2;
+                max2 = max1;
+                max1 = num;
+            } 
+            else if (num >= max2) {
+                max3 = max2;
+                max2 = num;
+            } 
+            else if (num >= max3) {
+                max3 = num;
+            }
+
+            // Find two smallest numbers
+            if (num <= min1) {
+                min2 = min1;
+                min1 = num;
+            } 
+            else if (num <= min2) {
+                min2 = num;
+            }
+        }
+
+        // Product of three largest numbers
+        int product1 = max1 * max2 * max3;
+
+        // Product of two smallest and largest numbers
+        int product2 = min1 * min2 * max1;
+
+        return max(product1, product2);
+    }
+};
+```
