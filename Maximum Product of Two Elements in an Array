@@ -1,0 +1,117 @@
+# Maximum Product of Two Elements in an Array
+
+## Problem Statement
+
+Given an integer array `nums`, choose two different elements from the array and return the maximum value of:
+
+```text
+(nums[i] - 1) * (nums[j] - 1)
+```
+
+where `i != j`.
+
+### Example
+
+**Input**
+```text
+nums = [3, 4, 5, 2]
+```
+
+**Output**
+```text
+12
+```
+
+**Explanation**
+
+The two largest elements are `5` and `4`.
+
+```text
+(5 - 1) * (4 - 1)
+= 4 * 3
+= 12
+```
+
+Therefore, the maximum product is `12`.
+
+---
+
+## Approach
+
+We use a **max heap (`priority_queue`)** to find the two largest elements.
+
+### Steps
+
+1. Insert all elements of `nums` into a max heap.
+2. Extract the largest element `a`.
+3. Extract the second-largest element `b`.
+4. Calculate:
+   ```text
+   (a - 1) * (b - 1)
+   ```
+5. Return the result.
+
+Since the maximum value of `(x - 1) * (y - 1)` is obtained using the two largest elements, only these two elements are needed.
+
+---
+
+## Algorithm
+
+1. Create a max heap.
+2. Push every element of `nums` into the heap.
+3. Remove the largest element and store it in `a`.
+4. Remove the second-largest element and store it in `b`.
+5. Return:
+   ```text
+   (a - 1) * (b - 1)
+   ```
+
+---
+
+## Complexity Analysis
+
+Let `n` be the number of elements in `nums`.
+
+- **Time Complexity:** `O(n log n)`
+  - Inserting all `n` elements into the priority queue takes `O(n log n)`.
+  - Extracting the top two elements takes `O(log n)`.
+
+- **Space Complexity:** `O(n)`
+  - The priority queue stores all elements.
+
+### Optimization
+
+This problem can also be solved in `O(n)` time and `O(1)` extra space by finding the two largest elements in a single pass without using a priority queue.
+
+---
+
+## C++ Solution
+
+```cpp
+class Solution {
+public:
+    int maxProduct(vector<int>& nums) {
+        priority_queue<int> pq;
+
+        for (int i = 0; i < nums.size(); i++) {
+            pq.push(nums[i]);
+        }
+
+        int ans = 0;
+
+        while (pq.size() > 1) {
+            int a = pq.top();
+            pq.pop();
+
+            int b = pq.top();
+            pq.pop();
+
+            int product = (a - 1) * (b - 1);
+
+            ans = max(product, ans);
+        }
+
+        return ans;
+    }
+};
+```
