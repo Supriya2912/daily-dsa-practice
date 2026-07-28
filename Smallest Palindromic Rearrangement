@@ -1,0 +1,108 @@
+# Smallest Palindromic Rearrangement
+
+## Problem Statement
+
+You are given a string `s` that can be rearranged into a palindrome.
+
+Return the **lexicographically smallest palindrome** that can be formed by rearranging the characters of `s`.
+
+### Example
+
+**Input**
+```text
+s = "aabb"
+```
+
+**Output**
+```text
+"abba"
+```
+
+**Explanation**
+
+The characters can be rearranged to form the palindrome `"abba"`.
+
+Since all characters must be used and the palindrome must be lexicographically smallest, the smaller characters are placed first in the left half.
+
+---
+
+## Approach
+
+A palindrome is symmetric, so we only need to construct the **left half** and then mirror it.
+
+### Steps
+
+1. Count the frequency of each character using an array of size `26`.
+2. Iterate through characters from `'a'` to `'z'`.
+3. Add `freq[i] / 2` copies of each character to the left half.
+4. If a character has an odd frequency, store it as the middle character.
+5. Create the right half by reversing the left half.
+6. Combine:
+   ```text
+   left + middle + right
+   ```
+
+Because characters are processed in increasing alphabetical order, the left half is lexicographically smallest. The right half is its reverse, ensuring the complete string is a palindrome.
+
+---
+
+## Algorithm
+
+1. Initialize a frequency array of size `26`.
+2. Count the occurrences of every character in `s`.
+3. Build `left` using half of each character's frequency in alphabetical order.
+4. Store the odd-frequency character as `middle`.
+5. Reverse `left` to obtain `right`.
+6. Return:
+   ```text
+   left + middle + right
+   ```
+
+---
+
+## Complexity Analysis
+
+Let `n` be the length of the string.
+
+- **Time Complexity:** `O(n)`
+  - Counting characters takes `O(n)`.
+  - Building and reversing the palindrome takes `O(n)`.
+
+- **Space Complexity:** `O(n)`
+  - The resulting palindrome requires `O(n)` space.
+  - The frequency array uses `O(1)` additional space because it has a fixed size of 26.
+
+---
+
+## C++ Solution
+
+```cpp
+class Solution {
+public:
+    string smallestPalindrome(string s) {
+        vector<int> freq(26, 0);
+
+        // Count character frequencies
+        for (char c : s)
+            freq[c - 'a']++;
+
+        string left = "";
+        string middle = "";
+
+        // Build the left half in lexicographical order
+        for (int i = 0; i < 26; i++) {
+            left.append(freq[i] / 2, char('a' + i));
+
+            // Store the character with an odd frequency
+            if (freq[i] % 2)
+                middle = char('a' + i);
+        }
+
+        // Mirror the left half
+        string right = left;
+        reverse(right.begin(), right.end());
+
+        return left + middle + right;
+    }
+};
+```
