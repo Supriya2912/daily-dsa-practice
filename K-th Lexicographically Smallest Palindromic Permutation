@@ -1,0 +1,364 @@
+# K-th Lexicographically Smallest Palindromic Permutation
+
+## Problem Statement
+
+You are given a string `s` and an integer `k`.
+
+The string `s` can be rearranged to form one or more palindromes. Return the **k-th lexicographically smallest palindrome** that can be formed by rearranging all characters of `s`.
+
+If fewer than `k` distinct palindromic permutations exist, return an empty string `""`.
+
+### Example
+
+**Input**
+```text
+s = "aabb"
+k = 1
+```
+
+**Output**
+```text
+"abba"
+```
+
+**Explanation**
+
+The only palindrome that can be formed is:
+
+```text
+"abba"
+```
+
+Therefore, the 1st lexicographically smallest palindrome is `"abba"`.
+
+---
+
+## Key Observation
+
+A palindrome is completely determined by:
+
+- Its **left half**
+- Its **middle character** (if the length is odd)
+- The reverse of its **left half**
+
+For example:
+
+```text
+s = "aabbc"
+
+Left Half = "ab"
+Middle    = "c"
+Right Half = "ba"
+
+Palindrome = "abcba"
+```
+
+Therefore, instead of generating all palindromes, we only need to find the **k-th lexicographically smallest permutation of the left half**.
+
+---
+
+## Approach
+
+### 1. Count Character Frequencies
+
+Count the frequency of every character in the input string.
+
+For example:
+
+```text
+s = "aabbc"
+
+a -> 2
+b -> 2
+c -> 1
+```
+
+---
+
+### 2. Construct the Left Half
+
+Each character contributes half of its frequency to the left half.
+
+```text
+a -> 2 / 2 = 1
+b -> 2 / 2 = 1
+c -> 1 / 2 = 0
+```
+
+Therefore:
+
+```text
+left half = "ab"
+```
+
+Characters with odd frequency contribute to the middle.
+
+```text
+middle = "c"
+```
+
+---
+
+### 3. Count Number of Possible Permutations
+
+For the remaining characters in the left half, we calculate how many distinct permutations can be formed.
+
+If the remaining counts are:
+
+```text
+a = 1
+b = 1
+```
+
+Then the number of permutations is:
+
+```text
+2! / (1! * 1!) = 2
+```
+
+The possible left halves are:
+
+```text
+ab
+ba
+```
+
+This allows us to determine which character should be selected at every position without generating every permutation.
+
+---
+
+### 4. Construct the K-th Lexicographical Half
+
+For each position:
+
+1. Try each available character from `'a'` to `'z'`.
+2. Temporarily place that character.
+3. Calculate the number of possible permutations with the remaining characters.
+4. If the number of permutations is at least `k`, keep that character.
+5. Otherwise, skip all those permutations and subtract their count from `k`.
+
+This process constructs the k-th lexicographically smallest left half.
+
+---
+
+### 5. Build the Final Palindrome
+
+Once the left half is constructed:
+
+```text
+result = left_half + middle + reverse(left_half)
+```
+
+For example:
+
+```text
+left_half = "ab"
+middle = "c"
+
+result = "ab" + "c" + "ba"
+
+result = "abcba"
+```
+
+---
+
+## Avoiding Large Combinations
+
+The number of permutations can become extremely large.
+
+However, we only care whether the number of permutations is:
+
+- Less than `k`
+- Greater than or equal to `k`
+
+Therefore, the calculation is capped at `k + 1`.
+
+If the number of ways exceeds `k`, we stop calculating further because the exact value is no longer necessary.
+
+This prevents unnecessary overflow and improves efficiency.
+
+---
+
+## Algorithm
+
+1. Count the frequency of each character.
+2. Build the frequency array for the left half.
+3. Store the odd-frequency character as the middle character.
+4. Calculate the total number of distinct permutations of the left half.
+5. If the total number of permutations is less than `k`, return `""`.
+6. For every position in the left half:
+   - Try characters from `'a'` to `'z'`.
+   - Temporarily decrease the selected character's frequency.
+   - Count permutations of the remaining characters.
+   - If the count is at least `k`, select the character.
+   - Otherwise, subtract the count from `k` and restore the frequency.
+7. Construct the palindrome using:
+   ```text
+   left_half + middle + reverse(left_half)
+   ```
+8. Return the result.
+
+---
+
+## Complexity Analysis
+
+Let `n` be the length of the string.
+
+The left half has at most `n / 2` characters.
+
+For each position, we try at most `26` characters. The permutation-counting function iterates over the `26` character frequencies and performs combination calculations.
+
+The practical complexity is approximately:
+
+```text
+O(n × 26 × C)
+```
+
+where `C` represents the bounded combination calculation.
+
+Since the alphabet contains only 26 lowercase English letters, the character-related factor is effectively constant.
+
+The space complexity is:
+
+```text
+O(n)
+```
+
+for storing the resulting palindrome and the constructed left half.
+
+---
+
+## C++ Solution
+
+```cpp
+class Solution {
+public:
+    string smallestPalindrome(string s, int k) {
+        vector<int> freq(26, 0);
+
+        // Count character frequencies
+        for (char c : s) {
+            freq[c - 'a']++;
+        }
+
+        vector<int> half(26, 0);
+        string mid = "";
+        int m = 0;
+
+        // Build frequency of the left half
+        for (int i = 0; i < 26; ++i) {
+            if (freq[i] % 2 != 0) {
+                mid += (char)(i + 'a');
+            }
+
+            half[i] = freq[i] / 2;
+            m += half[i];
+        }
+
+        // Calculate number of distinct permutations.
+        // Values larger than target_k are capped at target_k + 1.
+        auto get_ways = [&](const vector<int>& f, long long target_k) {
+            long long ways = 1;
+            int curr_len = 0;
+
+            for (int count : f) {
+                if (count > 0) {
+                    curr_len += count;
+
+                    long long n = curr_len;
+                    long long r = count;
+
+                    if (r > n - r) {
+                        r = n - r;
+                    }
+
+                    long long cur_nCr = 1;
+
+                    for (int i = 1; i <= r; ++i) {
+                        cur_nCr =
+                            cur_nCr * (n - i + 1) / i;
+
+                        if (cur_nCr > target_k) {
+                            cur_nCr = target_k + 1;
+                            break;
+                        }
+                    }
+
+                    ways *= cur_nCr;
+
+                    if (ways > target_k) {
+                        return target_k + 1;
+                    }
+                }
+            }
+
+            return ways;
+        };
+
+        // If fewer than k palindromes exist,
+        // return an empty string.
+        if (get_ways(half, k) < k) {
+            return "";
+        }
+
+        string first_half = "";
+
+        // Construct the k-th lexicographically smallest
+        // permutation of the left half.
+        for (int i = 0; i < m; ++i) {
+            for (int c = 0; c < 26; ++c) {
+
+                if (half[c] > 0) {
+                    // Temporarily choose character c
+                    half[c]--;
+
+                    // Count permutations possible
+                    // with the remaining characters
+                    long long ways = get_ways(half, k);
+
+                    if (ways >= k) {
+                        // Character c belongs at this position
+                        first_half += (char)(c + 'a');
+                        break;
+                    } else {
+                        // Skip these permutations
+                        k -= ways;
+
+                        // Restore the character
+                        half[c]++;
+                    }
+                }
+            }
+        }
+
+        // Construct the final palindrome
+        string res = first_half + mid;
+
+        for (int i = m - 1; i >= 0; --i) {
+            res += first_half[i];
+        }
+
+        return res;
+    }
+};
+```
+
+---
+
+## Important Insight
+
+The main idea is **not to generate all palindromic permutations**.
+
+Instead:
+
+```text
+Palindrome
+    ↓
+Left Half + Middle + Reverse(Left Half)
+    ↓
+Find K-th lexicographical permutation of Left Half
+    ↓
+Mirror the Left Half
+```
+
+This reduces the problem to finding the **k-th lexicographically smallest multiset permutation**, while using character frequencies to efficiently skip entire groups of permutations.
