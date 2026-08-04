@@ -1,0 +1,183 @@
+# Find Missing Elements
+
+## Problem Statement
+
+You are given an integer array `nums` containing distinct integers.
+
+Find all the integers that are missing between the **minimum** and **maximum** values present in the array.
+
+Return the missing elements in increasing order.
+
+### Example
+
+**Input**
+
+```text
+nums = [1, 4, 2, 5]
+```
+
+**Output**
+
+```text
+[3]
+```
+
+**Explanation**
+
+The minimum value is `1` and the maximum value is `5`.
+
+The complete range is:
+
+```text
+1, 2, 3, 4, 5
+```
+
+The only missing element is:
+
+```text
+3
+```
+
+---
+
+## Approach
+
+The solution uses an `unordered_set` to efficiently check whether a number exists in the input array.
+
+### Steps
+
+1. Insert all elements of `nums` into an `unordered_set`.
+2. Find the minimum element using `min_element()`.
+3. Find the maximum element using `max_element()`.
+4. Iterate through every number from `minimum` to `maximum`.
+5. If the number does not exist in the set, add it to the answer.
+6. Return the resulting vector.
+
+Since the numbers are checked in increasing order, the answer is automatically sorted.
+
+---
+
+## Algorithm
+
+```text
+Create a set containing all elements of nums
+
+Find:
+    mini = minimum element
+    maxi = maximum element
+
+For every number i from mini to maxi:
+    If i is not present in the set:
+        Add i to answer
+
+Return answer
+```
+
+---
+
+## Example Walkthrough
+
+Consider:
+
+```text
+nums = [6, 3, 5, 8]
+```
+
+The minimum and maximum values are:
+
+```text
+mini = 3
+maxi = 8
+```
+
+The complete range is:
+
+```text
+3, 4, 5, 6, 7, 8
+```
+
+The elements present in the array are:
+
+```text
+3, 5, 6, 8
+```
+
+Therefore, the missing elements are:
+
+```text
+4, 7
+```
+
+Output:
+
+```text
+[4, 7]
+```
+
+---
+
+## Complexity Analysis
+
+Let:
+
+* `n` = number of elements in `nums`
+* `R` = difference between the maximum and minimum values
+
+### Time Complexity
+
+```text
+O(n + R)
+```
+
+* Building the `unordered_set`: `O(n)` average
+* Finding minimum and maximum: `O(n)`
+* Checking every value in the range: `O(R)` average
+
+### Space Complexity
+
+```text
+O(n)
+```
+
+The `unordered_set` stores all elements of the input array.
+
+---
+
+## C++ Solution
+
+```cpp
+class Solution {
+public:
+    vector<int> findMissingElements(vector<int>& nums) {
+        // Store all elements for O(1) average lookup
+        unordered_set<int> st(nums.begin(), nums.end());
+
+        // Find minimum and maximum values
+        int mini = *min_element(nums.begin(), nums.end());
+        int maxi = *max_element(nums.begin(), nums.end());
+
+        vector<int> ans;
+
+        // Check every number in the range
+        for (int i = mini; i <= maxi; i++) {
+            if (!st.contains(i)) {
+                ans.push_back(i);
+            }
+        }
+
+        return ans;
+    }
+};
+```
+
+## Key Insight
+
+The key idea is to define the required range using:
+
+```text
+[min(nums), max(nums)]
+```
+
+Then, every number inside this range should be present in the array. Any number that is absent is a missing element.
+
+Using a hash set makes checking whether each number exists efficient.
