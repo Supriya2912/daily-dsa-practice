@@ -1,0 +1,229 @@
+# Winner Square Game
+
+## Problem Statement
+
+Alice and Bob take turns playing a game with `n` stones.
+
+On each turn, a player must remove a **perfect square number of stones** from the remaining pile.
+
+For example, a player can remove:
+
+```text
+1, 4, 9, 16, ...
+```
+
+The player who cannot make a move loses.
+
+Given `n`, return `true` if Alice can win assuming both players play optimally; otherwise, return `false`.
+
+### Example
+
+**Input**
+
+```text
+n = 7
+```
+
+**Output**
+
+```text
+true
+```
+
+**Explanation**
+
+Alice can remove `4`, leaving `3` stones.
+
+Bob can remove `1`, leaving `2`.
+
+Alice can remove `1`, leaving `1`.
+
+Bob removes `1` and Alice wins because Bob is unable to make another move.
+
+---
+
+## Approach
+
+This problem can be solved using **Dynamic Programming**.
+
+Define:
+
+```text
+dp[i] = true
+```
+
+if the current player can win when there are exactly `i` stones remaining.
+
+Otherwise:
+
+```text
+dp[i] = false
+```
+
+### Base Case
+
+When there are `0` stones:
+
+```text
+dp[0] = false
+```
+
+The player whose turn it is cannot make a move, so they lose.
+
+### DP Transition
+
+For every number of stones `i`, try removing every possible perfect square:
+
+```text
+1², 2², 3², ...
+```
+
+If removing a square leaves a losing position for the opponent, then the current player can win.
+
+Therefore:
+
+```text
+dp[i] = true
+```
+
+if there exists a square `j²` such that:
+
+```text
+dp[i - j²] == false
+```
+
+---
+
+## Algorithm
+
+1. Create a boolean DP array of size `n + 1`.
+2. Initialize all values to `false`.
+3. For every `i` from `1` to `n`:
+
+   * Try every perfect square `j² <= i`.
+   * If `dp[i - j²]` is `false`, mark `dp[i]` as `true`.
+   * Break because we have found a winning move.
+4. Return `dp[n]`.
+
+---
+
+## Example Walkthrough
+
+For:
+
+```text
+n = 5
+```
+
+We calculate:
+
+```text
+dp[0] = false
+```
+
+For `1`:
+
+```text
+1 - 1 = 0
+dp[0] = false
+
+Therefore dp[1] = true
+```
+
+For `2`:
+
+```text
+2 - 1 = 1
+dp[1] = true
+```
+
+There is no move to a losing state.
+
+```text
+dp[2] = false
+```
+
+For `3`:
+
+```text
+3 - 1 = 2
+dp[2] = false
+```
+
+Therefore:
+
+```text
+dp[3] = true
+```
+
+The resulting states begin:
+
+```text
+n:   0  1  2  3  4  5
+dp:  F  T  F  T  T  F
+```
+
+So for `n = 5`, the answer is:
+
+```text
+false
+```
+
+---
+
+## Complexity Analysis
+
+For every value from `1` to `n`, we try all perfect squares up to that value.
+
+### Time Complexity
+
+```text
+O(n√n)
+```
+
+There are `n` states, and each state checks at most `√n` perfect squares.
+
+### Space Complexity
+
+```text
+O(n)
+```
+
+The DP array contains `n + 1` boolean values.
+
+---
+
+## C++ Solution
+
+```cpp
+class Solution {
+public:
+    bool winnerSquareGame(int n) {
+        vector<bool> dp(n + 1, false);
+
+        for (int i = 1; i <= n; i++) {
+
+            // Try removing every possible perfect square
+            for (int j = 1; j * j <= i; j++) {
+
+                // If this move leaves the opponent
+                // in a losing position, current player wins
+                if (!dp[i - j * j]) {
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+
+        return dp[n];
+    }
+};
+```
+
+## Key Insight
+
+The important game-theory idea is:
+
+> **A position is winning if you can move to a losing position.**
+
+So instead of trying to simulate every possible sequence of moves, we store whether each smaller state is winning or losing and use those results to determine the current state.
