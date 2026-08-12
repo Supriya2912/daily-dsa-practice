@@ -1,0 +1,238 @@
+# Maximum Subarray Length With Frequency Limit
+
+## Problem Statement
+
+You are given an integer array `nums` and an integer `k`.
+
+Find the length of the **longest contiguous subarray** in which every distinct element appears **at most `k` times**.
+
+### Example
+
+**Input**
+
+```text
+nums = [1, 2, 1, 2, 1, 2, 3]
+k = 2
+```
+
+**Output**
+
+```text
+6
+```
+
+**Explanation**
+
+The longest valid subarray is:
+
+```text
+[1, 2, 1, 2, 1, 2]
+```
+
+However, this contains `1` three times and `2` three times, so it is not valid for `k = 2`.
+
+A valid longest subarray is:
+
+```text
+[2, 1, 2, 1, 2, 3]
+```
+
+where every element appears at most twice.
+
+---
+
+## Approach
+
+This problem is solved using the **Sliding Window / Two Pointer** technique.
+
+We maintain a window:
+
+```text
+[i ... j]
+```
+
+where:
+
+* `i` = left boundary
+* `j` = right boundary
+
+We also maintain a frequency map storing the number of occurrences of every element inside the current window.
+
+### Steps
+
+1. Initialize `i = 0`.
+2. Move `j` from left to right.
+3. Add `nums[j]` to the frequency map.
+4. If the frequency of `nums[j]` becomes greater than `k`, shrink the window from the left.
+5. Continue shrinking until the frequency constraint is satisfied.
+6. Update the maximum window length.
+
+The key observation is that when the newly added element exceeds the allowed frequency, only the left side of the window needs to be removed.
+
+---
+
+## Example Walkthrough
+
+Consider:
+
+```text
+nums = [1, 2, 1, 2, 1]
+k = 2
+```
+
+Initially:
+
+```text
+Window = []
+```
+
+Add `1`:
+
+```text
+Window = [1]
+freq[1] = 1
+```
+
+Add `2`:
+
+```text
+Window = [1, 2]
+freq[1] = 1
+freq[2] = 1
+```
+
+Add `1`:
+
+```text
+Window = [1, 2, 1]
+freq[1] = 2
+```
+
+Add `2`:
+
+```text
+Window = [1, 2, 1, 2]
+freq[2] = 2
+```
+
+Add another `1`:
+
+```text
+Window = [1, 2, 1, 2, 1]
+freq[1] = 3
+```
+
+Now `freq[1] > k`.
+
+Shrink from the left:
+
+```text
+Remove 1
+```
+
+Now:
+
+```text
+Window = [2, 1, 2, 1]
+freq[1] = 2
+freq[2] = 2
+```
+
+The window is valid again.
+
+---
+
+## Algorithm
+
+```text
+Initialize:
+    left = 0
+    maxLength = 0
+    frequency map
+
+For right = 0 to n - 1:
+
+    Increase frequency of nums[right]
+
+    While frequency of nums[right] > k:
+        Decrease frequency of nums[left]
+        Move left forward
+
+    Update maximum length:
+        maxLength = max(maxLength, right - left + 1)
+
+Return maxLength
+```
+
+---
+
+## Complexity Analysis
+
+Let `n` be the length of `nums`.
+
+### Time Complexity
+
+```text
+O(n)
+```
+
+Each element is added to the window once and removed from the window at most once.
+
+### Space Complexity
+
+```text
+O(n)
+```
+
+In the worst case, the frequency map can contain all distinct elements.
+
+---
+
+## C++ Solution
+
+```cpp
+class Solution {
+public:
+    int maxSubarrayLength(vector<int>& nums, int k) {
+        int n = nums.size();
+        int maxlen = 0;
+
+        unordered_map<int, int> freq;
+
+        for (int i = 0, j = 0; j < n; j++) {
+
+            // Increase frequency of current element
+            int &count = freq[nums[j]];
+            count++;
+
+            // Shrink window while frequency exceeds k
+            while (count > k) {
+                freq[nums[i++]]--;
+            }
+
+            // Update maximum valid window length
+            maxlen = max(maxlen, j - i + 1);
+        }
+
+        return maxlen;
+    }
+};
+```
+
+## Key Insight
+
+The core idea is to maintain a **valid sliding window** where every element occurs at most `k` times.
+
+```text
+Expand right
+     ↓
+Frequency exceeds k?
+     ↓
+   Yes
+     ↓
+Move left until valid
+     ↓
+Update maximum length
+```
+
+This avoids checking every possible subarray and reduces the solution from a potentially `O(n²)` approach to **O(n)**.
