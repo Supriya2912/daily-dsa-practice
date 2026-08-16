@@ -1,0 +1,42 @@
+# Stone Game IX
+
+## Problem Statement
+
+Alice and Bob take turns removing stones from a pile.
+
+Each stone has an integer value. On each turn, a player removes one stone and adds its value to the current sum.
+
+If the sum becomes divisible by 3, the player who made that move loses.
+
+The game continues until no stones remain.
+
+Given an integer array `stones`, return `true` if Alice can win assuming both players play optimally, otherwise return `false`.
+
+## Approach
+
+The actual values of the stones are not important. Only their remainder when divided by `3` matters.
+
+We divide all stones into three groups:
+
+- `cnt[0]` → stones where `stone % 3 == 0`
+- `cnt[1]` → stones where `stone % 3 == 1`
+- `cnt[2]` → stones where `stone % 3 == 2`
+
+### Key Observations
+
+If the number of remainder-0 stones is even:
+
+- Alice can win only if there is at least one remainder-1 stone and one remainder-2 stone.
+
+If the number of remainder-0 stones is odd:
+
+- Alice wins when the difference between the number of remainder-1 and remainder-2 stones is greater than `2`.
+
+Therefore:
+
+```cpp
+if (cnt[0] % 2 == 0) {
+    return cnt[1] > 0 && cnt[2] > 0;
+}
+
+return abs(cnt[1] - cnt[2]) > 2;
