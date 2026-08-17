@@ -1,0 +1,104 @@
+# Stone Game V
+
+## Problem Statement
+
+Alice and Bob play a game with an array of stone values.
+
+For each turn, Alice divides the current array into two non-empty parts. Let the sums of the two parts be `leftSum` and `rightSum`.
+
+- If `leftSum < rightSum`, Alice keeps the left part and gains `leftSum`.
+- If `leftSum > rightSum`, Alice keeps the right part and gains `rightSum`.
+- If both sums are equal, Alice can choose either part.
+
+The game continues until only one stone remains.
+
+Return the maximum score Alice can obtain.
+
+## Approach
+
+We use **Dynamic Programming with Prefix Sums**.
+
+Define:
+
+`dp[l][r]` = maximum score obtainable from the subarray `stoneValue[l...r]`.
+
+For every possible split point `k`:
+
+- Calculate the left and right sums using prefix sums.
+- If `leftSum < rightSum`, keep the left side.
+- If `leftSum > rightSum`, keep the right side.
+- If they are equal, consider both choices.
+
+Prefix sums allow us to calculate each range sum in `O(1)`.
+
+Memoization ensures every interval is solved only once.
+
+## Complexity
+
+- Time: `O(n^3)`
+- Space: `O(n^2)`
+
+## C++ Solution
+
+```cpp
+class Solution {
+    vector<vector<int>> dp;
+    vector<int> prefix;
+    vector<int> a;
+
+    int solve(int l, int r) {
+        if (l >= r)
+            return 0;
+
+        if (dp[l][r] != -1)
+            return dp[l][r];
+
+        int ans = 0;
+
+        int leftSum = 0;
+        int rightSum = prefix[r + 1] - prefix[l];
+
+        for (int k = l; k < r; ++k) {
+            leftSum += a[k];
+            rightSum -= a[k];
+
+            if (leftSum < rightSum) {
+                if (ans >= 2 * leftSum)
+                    continue;
+
+                ans = max(ans, leftSum + solve(l, k));
+            }
+            else if (leftSum > rightSum) {
+                if (ans >= 2 * rightSum)
+                    break;
+
+                ans = max(ans, rightSum + solve(k + 1, r));
+            }
+            else {
+                ans = max({
+                    ans,
+                    leftSum + solve(l, k),
+                    rightSum + solve(k + 1, r)
+                });
+            }
+        }
+
+        return dp[l][r] = ans;
+    }
+
+public:
+    int stoneGameV(vector<int>& stoneValue) {
+        a = stoneValue;
+
+        int n = a.size();
+
+        prefix.resize(n + 1);
+
+        for (int i = 0; i < n; ++i)
+            prefix[i + 1] = prefix[i] + a[i];
+
+        dp.assign(n, vector<int>(n, -1));
+
+        return solve(0, n - 1);
+    }
+};
