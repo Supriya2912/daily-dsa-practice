@@ -1,0 +1,74 @@
+# Largest Integer
+
+## Problem Statement
+
+Given an integer array `nums` and an integer `k`, find the largest integer that appears in exactly one subarray of length `k`.
+
+Return `-1` if no such integer exists.
+
+## Approach
+
+There are three cases:
+
+### Case 1: `k == n`
+
+There is only one subarray, containing the entire array.
+
+Therefore, every element appears in that subarray, and the answer is simply the maximum element.
+
+### Case 2: `k == 1`
+
+Every element forms its own subarray.
+
+Therefore, an element appears in exactly one subarray only when it occurs exactly once in the entire array.
+
+### Case 3: `1 < k < n`
+
+For a length-`k` sliding window:
+
+- The first element can belong to only the first window.
+- The last element can belong to only the last window.
+- Every element between them belongs to multiple windows.
+
+Therefore, only `nums[0]` and `nums[n-1]` can potentially be the answer.
+
+We check whether either occurs exactly once and return the larger valid value.
+
+## Complexity
+
+- Time: `O(n²)` due to repeated `count()` operations.
+- Space: `O(n)` for the result vector.
+
+## C++ Solution
+
+```cpp
+class Solution {
+public:
+    int largestInteger(vector<int>& nums, int k) {
+        int n = nums.size();
+
+        if (k == n) {
+            return *max_element(nums.begin(), nums.end());
+        }
+
+        vector<int> arr;
+
+        if (k == 1) {
+            for (int x : nums) {
+                if (count(nums.begin(), nums.end(), x) == 1) {
+                    arr.push_back(x);
+                }
+            }
+        } else {
+            for (int x : {nums[0], nums[n - 1]}) {
+                if (count(nums.begin(), nums.end(), x) == 1) {
+                    arr.push_back(x);
+                }
+            }
+        }
+
+        return arr.empty()
+            ? -1
+            : *max_element(arr.begin(), arr.end());
+    }
+};
