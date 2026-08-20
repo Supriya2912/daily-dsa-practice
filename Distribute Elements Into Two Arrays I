@@ -1,0 +1,55 @@
+# Distribute Elements Into Two Arrays I
+
+## Problem Statement
+
+Given an integer array `nums`, distribute its elements into two arrays `arr1` and `arr2`.
+
+Initially:
+
+- `arr1 = [nums[0]]`
+- `arr2 = [nums[1]]`
+
+For every remaining element `nums[i]`:
+
+- If the last element of `arr1` is greater than the last element of `arr2`, append `nums[i]` to `arr1`.
+- Otherwise, append `nums[i]` to `arr2`.
+
+Finally, concatenate `arr1` and `arr2` and return the resulting array.
+
+## Approach
+
+We maintain two arrays and compare their last elements while processing the remaining elements.
+
+At every step:
+
+1. Compare `arr1.back()` and `arr2.back()`.
+2. Add the current element to the array whose last element is greater.
+3. After processing all elements, append `arr2` to `arr1`.
+
+This directly follows the problem's distribution rule.
+
+## Complexity
+
+- Time: `O(n)`
+- Space: `O(n)`
+
+## C++ Solution
+
+```cpp
+class Solution {
+public:
+    vector<int> resultArray(vector<int>& nums) {
+        vector<int> arr1 = {nums[0]};
+        vector<int> arr2 = {nums[1]};
+
+        for (int i = 2; i < nums.size(); i++) {
+            if (arr1.back() > arr2.back())
+                arr1.push_back(nums[i]);
+            else
+                arr2.push_back(nums[i]);
+        }
+
+        arr1.insert(arr1.end(), arr2.begin(), arr2.end());
+        return arr1;
+    }
+};
